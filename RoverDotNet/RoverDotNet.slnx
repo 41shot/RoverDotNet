@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/RoverDotNet.Core/RoverDotNet.Core.csproj" />
     <Project Path="src/RoverDotNet.Client/RoverDotNet.Client.csproj" />
