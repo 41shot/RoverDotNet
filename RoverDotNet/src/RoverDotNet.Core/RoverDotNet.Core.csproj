@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    RoverDotNet.Core
+    ================
+    Foundational types with no dependency on other RoverDotNet projects.
+
+    Responsibility (mirrors: houston + rover-std)
+    - Credential model: Credential, CredentialOrigin
+    - Profile config I/O: ConfigHome, ProfileConfig (TOML read/write under $APOLLO_CONFIG_HOME)
+    - API key masking: ApiKeyMasker
+    - Shared error types: RoverException, ErrorCode
+    - Logging abstractions consumed by all upper layers
+  -->
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Tomlyn" />
+  </ItemGroup>
+
+</Project>

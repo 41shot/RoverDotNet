@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    RoverDotNet.Dev
+    ===============
+    Local development server — runs a local Apollo Router, watches subgraph schemas,
+    recomposes the supergraph on changes.
+
+    Responsibility (mirrors: src/command/dev/ + src/composition/)
+    - DevSession:         orchestrates the local dev loop
+    - SubgraphWatcher:    detects schema changes in watched subgraphs
+    - CompositionRunner:  invokes supergraph composition
+    - RouterProcess:      manages the local Router child process
+
+    Status: scaffolded — implementation follows once Core and Config are complete.
+
+    Depends on: RoverDotNet.Client (Studio API calls for graph refs, router versions)
+  -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\RoverDotNet.Client\RoverDotNet.Client.csproj" />
+  </ItemGroup>
+
+</Project>

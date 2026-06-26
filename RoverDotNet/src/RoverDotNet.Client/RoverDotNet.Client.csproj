@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    RoverDotNet.Client
+    ==================
+    Apollo Studio HTTP + GraphQL transport layer.
+
+    Responsibility (mirrors: rover-http + rover-graphql + rover-client)
+    - StudioHttpClient: typed HttpClient that injects x-api-key header
+    - GraphQL envelope types: GraphQLRequest<TVariables>, GraphQLResponse<TData>
+    - Typed Studio operations (one class per operation):
+        - WhoAmIOperation  (mirrors: operations/config/who_am_i/)
+    - Result types: RegistryIdentity, Actor
+
+    Depends on: RoverDotNet.Core
+  -->
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Http" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RoverDotNet.Core\RoverDotNet.Core.csproj" />
+  </ItemGroup>
+
+</Project>

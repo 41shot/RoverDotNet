@@ -1,3 +1,13 @@
 <Solution>
-  <Project Path="RoverDotNet/RoverDotNet.csproj" />
+  <Folder Name="/src/">
+    <Project Path="src/RoverDotNet.Core/RoverDotNet.Core.csproj" />
+    <Project Path="src/RoverDotNet.Client/RoverDotNet.Client.csproj" />
+    <Project Path="src/RoverDotNet.Config/RoverDotNet.Config.csproj" />
+    <Project Path="src/RoverDotNet.Dev/RoverDotNet.Dev.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/RoverDotNet.Core.Tests/RoverDotNet.Core.Tests.csproj" />
+    <Project Path="tests/RoverDotNet.Client.Tests/RoverDotNet.Client.Tests.csproj" />
+    <Project Path="tests/RoverDotNet.Config.Tests/RoverDotNet.Config.Tests.csproj" />
+  </Folder>
 </Solution>

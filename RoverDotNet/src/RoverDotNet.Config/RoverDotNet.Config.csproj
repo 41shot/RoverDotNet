@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    RoverDotNet.Config
+    ==================
+    Implementations of the config command family.
+
+    Responsibility (mirrors: src/command/config/)
+    - ConfigAuth:   prompt for / accept an API key, persist it via ProfileConfig
+    - ConfigWhoAmI: load credential, call WhoAmIOperation, return WhoAmIResult
+    - ConfigList:   enumerate known profiles
+    - ConfigClear:  wipe the config home
+    - ConfigDelete: remove a named profile
+
+    Depends on: RoverDotNet.Core (ProfileConfig, Credential)
+                RoverDotNet.Client (WhoAmIOperation, RegistryIdentity)
+  -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\RoverDotNet.Core\RoverDotNet.Core.csproj" />
+    <ProjectReference Include="..\RoverDotNet.Client\RoverDotNet.Client.csproj" />
+  </ItemGroup>
+
+</Project>
