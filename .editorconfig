@@ -1,4 +1,14 @@
-﻿[*Tests.cs]
+﻿# Suppress XML comment warnings for test projects
+[tests/**/*.cs]
+# CS1591: Missing XML comment for publicly visible type or member
+dotnet_diagnostic.CS1591.severity = none
 
+# Suppress XML comment warnings for Demo project main form.
+[src/RoverDotNet.Demo/*.cs]
+# CS1591: Missing XML comment for publicly visible type or member
+dotnet_diagnostic.CS1591.severity = none
+
+# Suppress XML comment warnings for Demo project additional forms.
+[src/RoverDotNet.Demo/**/*.cs]
 # CS1591: Missing XML comment for publicly visible type or member
 dotnet_diagnostic.CS1591.severity = none

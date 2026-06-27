@@ -1,4 +1,4 @@
-using RoverDotNet.Config.Auth;
+using RoverDotNet.Core.Config;
 
 namespace RoverDotNet.Demo.Forms;
 

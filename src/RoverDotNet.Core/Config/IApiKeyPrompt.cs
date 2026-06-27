@@ -1,4 +1,4 @@
-namespace RoverDotNet.Config.Auth;
+namespace RoverDotNet.Core.Config;
 
 /// <summary>
 /// Prompts the user to enter an API key.
