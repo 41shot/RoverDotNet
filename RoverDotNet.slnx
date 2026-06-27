@@ -8,14 +8,15 @@
     <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="src/RoverDotNet.Core/RoverDotNet.Core.csproj" />
     <Project Path="src/RoverDotNet.Client/RoverDotNet.Client.csproj" />
     <Project Path="src/RoverDotNet.Config/RoverDotNet.Config.csproj" />
+    <Project Path="src/RoverDotNet.Core/RoverDotNet.Core.csproj" />
+    <Project Path="src/RoverDotNet.Demo/RoverDotNet.Demo.csproj" Id="3a2e11e2-0cec-476b-a86d-dbea71516bb7" />
     <Project Path="src/RoverDotNet.Dev/RoverDotNet.Dev.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/RoverDotNet.Core.Tests/RoverDotNet.Core.Tests.csproj" />
     <Project Path="tests/RoverDotNet.Client.Tests/RoverDotNet.Client.Tests.csproj" />
     <Project Path="tests/RoverDotNet.Config.Tests/RoverDotNet.Config.Tests.csproj" />
+    <Project Path="tests/RoverDotNet.Core.Tests/RoverDotNet.Core.Tests.csproj" />
   </Folder>
 </Solution>
