@@ -6,12 +6,14 @@ namespace RoverDotNet.Demo
     {
         private readonly ConfigWhoAmIForm _configWhoAmIForm;
         private readonly ConfigAuthForm _configAuthForm;
+        private readonly DevForm _devForm;
 
-        public MainForm(ConfigWhoAmIForm configWhoAmIForm, ConfigAuthForm configAuthForm)
+        public MainForm(ConfigWhoAmIForm configWhoAmIForm, ConfigAuthForm configAuthForm, DevForm devForm)
         {
             InitializeComponent();
             _configWhoAmIForm = configWhoAmIForm;
             _configAuthForm = configAuthForm;
+            _devForm = devForm;
         }
 
         private void configWhoAmIButton_Click(object sender, EventArgs e)
@@ -30,6 +32,11 @@ namespace RoverDotNet.Demo
                 : profileTextBox.Text.Trim();
 
             _configAuthForm.ShowDialog(this);
+        }
+
+        private void devButton_Click(object sender, EventArgs e)
+        {
+            _devForm.ShowDialog(this);
         }
     }
 }

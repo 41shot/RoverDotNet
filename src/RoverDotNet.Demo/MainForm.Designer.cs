@@ -77,13 +77,13 @@
             // 
             // devButton
             // 
-            devButton.Enabled = false;
             devButton.Location = new Point(15, 144);
             devButton.Name = "devButton";
             devButton.Size = new Size(200, 40);
             devButton.TabIndex = 4;
-            devButton.Text = "Dev (Coming Soon)";
+            devButton.Text = "Dev";
             devButton.UseVisualStyleBackColor = true;
+            devButton.Click += devButton_Click;
             // 
             // operationsGroupBox
             // 

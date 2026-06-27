@@ -48,6 +48,7 @@ internal static class ServiceConfiguration
         services.AddSingleton<MainForm>();
         services.AddTransient<ConfigWhoAmIForm>();
         services.AddTransient<ConfigAuthForm>();
+        services.AddTransient<DevForm>();
 
         return services;
     }

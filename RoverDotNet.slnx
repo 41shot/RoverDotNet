@@ -18,5 +18,8 @@
     <Project Path="tests/RoverDotNet.Client.Tests/RoverDotNet.Client.Tests.csproj" />
     <Project Path="tests/RoverDotNet.Config.Tests/RoverDotNet.Config.Tests.csproj" />
     <Project Path="tests/RoverDotNet.Core.Tests/RoverDotNet.Core.Tests.csproj" />
+    <Project Path="tests/RoverDotNet.Dev.Tests/RoverDotNet.Dev.Tests.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
   </Folder>
 </Solution>
