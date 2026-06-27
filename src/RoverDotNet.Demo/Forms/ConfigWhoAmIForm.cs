@@ -1,3 +1,4 @@
+using RoverDotNet.Client.Http;
 using RoverDotNet.Client.Operations.WhoAmI;
 using RoverDotNet.Config.WhoAmI;
 using RoverDotNet.Core.Config;
@@ -76,6 +77,22 @@ public partial class ConfigWhoAmIForm : RoverOperationFormBase
             MessageBox.Show(
                 ex.Message + "\n\nPlease verify your API key is valid.",
                 "Invalid API Key",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+            Close();
+        }
+        catch (StudioClientException ex)
+        {
+            var text = $"An error occurred while communicating with the Studio API.\n\n{ex.Message}";
+
+            if (ex.Errors != null && ex.Errors.Any(e => e?.Message != null && e.Message.StartsWith("Unauthorized")))
+            {
+                text += "\n\nUse 'config auth' to set a new API key.";
+            }
+
+            MessageBox.Show(
+                text,
+                "Studio API Error",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
             Close();
