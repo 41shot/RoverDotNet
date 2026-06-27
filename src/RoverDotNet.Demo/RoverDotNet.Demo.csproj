@@ -8,4 +8,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\RoverDotNet.Config\RoverDotNet.Config.csproj" />
+    <ProjectReference Include="..\RoverDotNet.Core\RoverDotNet.Core.csproj" />
+    <ProjectReference Include="..\RoverDotNet.Client\RoverDotNet.Client.csproj" />
+  </ItemGroup>
+
 </Project>
