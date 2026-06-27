@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using RoverDotNet.Client.Http;
 using RoverDotNet.Client.Operations.WhoAmI;
+using RoverDotNet.Config.Auth;
 using RoverDotNet.Config.WhoAmI;
 using RoverDotNet.Core.Config;
 using RoverDotNet.Demo.Forms;
@@ -40,10 +41,13 @@ internal static class ServiceConfiguration
 
         // Config services
         services.AddSingleton<ConfigWhoAmI>();
+        services.AddSingleton<IApiKeyPrompt, WinFormsApiKeyPrompt>();
+        services.AddSingleton<ConfigAuth>();
 
         // Forms
         services.AddSingleton<MainForm>();
         services.AddTransient<ConfigWhoAmIForm>();
+        services.AddTransient<ConfigAuthForm>();
 
         return services;
     }

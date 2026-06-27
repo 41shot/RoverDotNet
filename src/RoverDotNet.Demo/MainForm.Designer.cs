@@ -67,13 +67,13 @@
             // 
             // configAuthButton
             // 
-            configAuthButton.Enabled = false;
             configAuthButton.Location = new Point(15, 88);
             configAuthButton.Name = "configAuthButton";
             configAuthButton.Size = new Size(200, 40);
             configAuthButton.TabIndex = 3;
-            configAuthButton.Text = "Config Auth (Coming Soon)";
+            configAuthButton.Text = "Config Auth";
             configAuthButton.UseVisualStyleBackColor = true;
+            configAuthButton.Click += configAuthButton_Click;
             // 
             // devButton
             // 
