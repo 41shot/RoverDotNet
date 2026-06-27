@@ -10,8 +10,11 @@ namespace RoverDotNet.Demo.Forms;
 /// </summary>
 public partial class ConfigWhoAmIForm : RoverOperationFormBase
 {
-    public ConfigWhoAmIForm()
+    private readonly ConfigWhoAmI _configWhoAmI;
+
+    public ConfigWhoAmIForm(ConfigWhoAmI configWhoAmI)
     {
+        _configWhoAmI = configWhoAmI;
         InitializeComponent();
     }
 
@@ -42,23 +45,9 @@ public partial class ConfigWhoAmIForm : RoverOperationFormBase
     {
         try
         {
-            // Create the required dependencies
-            var profileConfig = new ProfileConfig();
-            using var httpClient = new HttpClient();
-            var studioClient = new Client.Http.StudioHttpClient(
-                httpClient,
-                clientVersion: "demo-1.0.0");
-            var operation = new WhoAmIOperation(studioClient);
-            var configWhoAmI = new ConfigWhoAmI(profileConfig, operation);
-
-            // Determine the profile name to use
-            var profileName = string.IsNullOrWhiteSpace(ProfileName)
-                ? ProfileConfig.DefaultProfile
-                : ProfileName;
-
-            // Execute the operation
-            var result = await configWhoAmI.ExecuteAsync(
-                profileName: profileName,
+            // Execute the operation using the injected ConfigWhoAmI
+            var result = await _configWhoAmI.ExecuteAsync(
+                profileName: ProfileName ?? ProfileConfig.DefaultProfile,
                 unmaskKey: false,
                 cancellationToken: default);
 

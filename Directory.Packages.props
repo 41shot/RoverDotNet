@@ -1,20 +1,17 @@
 <Project>
-
   <PropertyGroup>
-	<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
-
   <ItemGroup Label="Production dependencies">
-	<PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.9" />
-	<PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9" />
-	<PackageVersion Include="Tomlyn" Version="2.9.0" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.9" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9" />
+    <PackageVersion Include="Tomlyn" Version="2.9.0" />
   </ItemGroup>
-
   <ItemGroup Label="Test dependencies">
-	<PackageVersion Include="coverlet.collector" Version="10.0.1" />
-	<PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.7.0" />
-	<PackageVersion Include="xunit" Version="2.9.3" />
-	<PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
+    <PackageVersion Include="coverlet.collector" Version="10.0.1" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.7.0" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
   </ItemGroup>
-
 </Project>

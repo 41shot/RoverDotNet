@@ -4,21 +4,21 @@ namespace RoverDotNet.Demo
 {
     public partial class MainForm : Form
     {
-        public MainForm()
+        private readonly ConfigWhoAmIForm _configWhoAmIForm;
+
+        public MainForm(ConfigWhoAmIForm configWhoAmIForm)
         {
             InitializeComponent();
+            _configWhoAmIForm = configWhoAmIForm;
         }
 
         private void configWhoAmIButton_Click(object sender, EventArgs e)
         {
-            var form = new ConfigWhoAmIForm
-            {
-                ProfileName = string.IsNullOrWhiteSpace(profileTextBox.Text)
-                    ? null
-                    : profileTextBox.Text.Trim()
-            };
+            _configWhoAmIForm.ProfileName = string.IsNullOrWhiteSpace(profileTextBox.Text)
+                ? null
+                : profileTextBox.Text.Trim();
 
-            form.ShowDialog(this);
+            _configWhoAmIForm.ShowDialog(this);
         }
     }
 }
