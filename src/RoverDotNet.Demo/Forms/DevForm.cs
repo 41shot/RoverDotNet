@@ -30,10 +30,16 @@ public partial class DevForm : RoverOperationFormBase
 
     private void AddSampleSubgraphs()
     {
-        // Add example subgraph entries
+        // Get the path to the schema files in the output directory
+        var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        var usersSchemaPath = Path.Combine(baseDirectory, "Schemas", "users.graphql");
+        var productsSchemaPath = Path.Combine(baseDirectory, "Schemas", "products.graphql");
+
+        // Add example subgraph entries with actual schema files
         var exampleText = "# Example subgraph configuration:\r\n"
-            + "# users|http://localhost:4001|path/to/users.graphql\r\n"
-            + "# products|http://localhost:4002|path/to/products.graphql\r\n";
+            + $"users|http://localhost:4001|{usersSchemaPath}\r\n"
+            + $"products|http://localhost:4002|{productsSchemaPath}\r\n"
+            + "# Add more subgraphs in the format: name|url|schema_path\r\n";
 
         subgraphsTextBox.Text = exampleText;
     }

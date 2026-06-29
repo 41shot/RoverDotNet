@@ -1,0 +1,40 @@
+# Users Subgraph Schema
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@key", "@shareable"])
+
+type Query {
+  user(id: ID!): User
+  users: [User!]!
+  me: User
+}
+
+type Mutation {
+  createUser(input: CreateUserInput!): User!
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+  deleteUser(id: ID!): Boolean!
+}
+
+type User @key(fields: "id") {
+  id: ID!
+  username: String!
+  email: String!
+  firstName: String
+  lastName: String
+  createdAt: String!
+  isActive: Boolean!
+}
+
+input CreateUserInput {
+  username: String!
+  email: String!
+  firstName: String
+  lastName: String
+}
+
+input UpdateUserInput {
+  username: String
+  email: String
+  firstName: String
+  lastName: String
+  isActive: Boolean
+}
