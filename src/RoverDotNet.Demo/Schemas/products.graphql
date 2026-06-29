@@ -1,6 +1,6 @@
 # Products Subgraph Schema
 extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@key", "@shareable", "@external"])
+  @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@key", "@shareable"])
 
 type Query {
   product(id: ID!): Product
@@ -30,7 +30,7 @@ type Product @key(fields: "id") {
 
 # Reference to User from users subgraph
 type User @key(fields: "id") {
-  id: ID! @external
+  id: ID!
 }
 
 enum ProductCategory {
