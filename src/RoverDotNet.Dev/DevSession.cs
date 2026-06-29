@@ -169,7 +169,7 @@ public sealed class DevSession : IDisposable
     private async Task StartRouterAsync(CancellationToken cancellationToken)
     {
         var routerBinaryPath = _configuration.RouterBinaryPath
-            ?? await LocateRouterBinaryAsync();
+            ?? await LocateRouterBinaryAsync(cancellationToken);
 
         RaiseStateChanged(DevSessionState.Starting, $"Starting router from: {routerBinaryPath}");
 
@@ -314,24 +314,25 @@ public sealed class DevSession : IDisposable
         }
     }
 
-    private async Task<string> LocateRouterBinaryAsync()
+    private async Task<string> LocateRouterBinaryAsync(CancellationToken cancellationToken = default)
     {
-        // For now, assume "router" or "router.exe" is in PATH
-        // In a real implementation, we could query the Studio API for the latest version
-        // and download it if necessary
-        var routerName = OperatingSystem.IsWindows() ? "router.exe" : "router";
+        var routerManager = new RouterBinaryManager();
 
-        // Check if it's in PATH
-        var pathDirs = Environment.GetEnvironmentVariable("PATH")?.Split(Path.PathSeparator) ?? Array.Empty<string>();
-        foreach (var dir in pathDirs)
+        // Forward download progress to state changed events
+        routerManager.DownloadProgressChanged += (_, progress) =>
+            RaiseStateChanged(State, progress.Message);
+
+        try
         {
-            var candidate = Path.Combine(dir, routerName);
-            if (File.Exists(candidate))
-                return candidate;
+            return await routerManager.LocateOrDownloadAsync(
+                preferredVersion: null,
+                cancellationToken: cancellationToken);
         }
-
-        throw new RouterProcessException(
-            $"Apollo Router binary not found. Please download the router and add it to PATH, or specify RouterBinaryPath in the configuration.");
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            throw new RouterProcessException(
+                $"Failed to locate or download Apollo Router binary: {ex.Message}", ex);
+        }
     }
 
     private void RaiseStateChanged(DevSessionState state, string message, Exception? exception = null)

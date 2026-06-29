@@ -161,7 +161,7 @@ public partial class DevForm : RoverOperationFormBase
 
         if (accepted)
         {
-            LogMessage("ELv2 licence accepted by user. Installing router plugin...");
+            LogMessage("ELv2 licence accepted by user.");
         }
         else
         {

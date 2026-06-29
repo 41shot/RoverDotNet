@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Text.RegularExpressions;
 using RoverDotNet.Dev.Exceptions;
 
 namespace RoverDotNet.Dev.Router;
@@ -11,11 +12,15 @@ namespace RoverDotNet.Dev.Router;
 /// </summary>
 public sealed class RouterProcess : IDisposable
 {
+    private const string DefaultHealthCheckUrl = "http://127.0.0.1:8088/health";
+    private static readonly Regex HealthCheckUrlPattern = new(@"Health check exposed at (http://[^\s]+)", RegexOptions.Compiled);
+
     private readonly string _routerBinaryPath;
     private readonly int _port;
     private string _supergraphSchemaPath;
     private Process? _process;
     private bool _disposed;
+    private string? _healthCheckUrl;
 
     /// <summary>
     /// Raised when the router process writes to stdout.
@@ -84,7 +89,7 @@ public sealed class RouterProcess : IDisposable
         var startInfo = new ProcessStartInfo
         {
             FileName = _routerBinaryPath,
-            Arguments = $"--supergraph \"{_supergraphSchemaPath}\" --port {_port}",
+            Arguments = $"--supergraph \"{_supergraphSchemaPath}\" --hot-reload --dev --listen 127.0.0.1:{_port}",
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
@@ -97,7 +102,20 @@ public sealed class RouterProcess : IDisposable
 
         _process.OutputDataReceived += (_, e) =>
         {
-            if (e.Data != null) OutputReceived?.Invoke(this, e.Data);
+            if (e.Data != null)
+            {
+                // Try to extract health check URL from router output
+                if (_healthCheckUrl is null)
+                {
+                    var match = HealthCheckUrlPattern.Match(e.Data);
+                    if (match.Success)
+                    {
+                        _healthCheckUrl = match.Groups[1].Value;
+                    }
+                }
+
+                OutputReceived?.Invoke(this, e.Data);
+            }
         };
         _process.ErrorDataReceived += (_, e) =>
         {
@@ -169,8 +187,9 @@ public sealed class RouterProcess : IDisposable
     {
         await StopAsync(cancellationToken);
 
-        // Update the schema path
+        // Update the schema path and reset health check URL
         _supergraphSchemaPath = newSupergraphSchemaPath;
+        _healthCheckUrl = null;
 
         await StartAsync(cancellationToken);
     }
@@ -180,13 +199,15 @@ public sealed class RouterProcess : IDisposable
     /// </summary>
     private async Task WaitForHealthCheckAsync(CancellationToken cancellationToken)
     {
-        var healthUrl = $"http://localhost:{_port}/health";
         using var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(1) };
 
         var maxAttempts = 30; // 30 seconds max
         for (var i = 0; i < maxAttempts; i++)
         {
             cancellationToken.ThrowIfCancellationRequested();
+
+            // Use the detected health check URL, or fall back to the default
+            var healthUrl = _healthCheckUrl ?? DefaultHealthCheckUrl;
 
             try
             {
@@ -199,7 +220,7 @@ public sealed class RouterProcess : IDisposable
                 // Ignore and retry
             }
 
-            await Task.Delay(1000, cancellationToken);
+            await Task.Delay(250, cancellationToken); // Check every 250ms
         }
 
         throw new RouterProcessException(
