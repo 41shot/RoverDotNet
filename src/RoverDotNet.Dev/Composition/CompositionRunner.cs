@@ -26,6 +26,12 @@ public sealed class CompositionRunner
     }
 
     /// <summary>
+    /// Event raised when the ELv2 licence acceptance is required.
+    /// The handler should return true to accept the licence, false to decline.
+    /// </summary>
+    public event Func<Task<bool>>? LicenceAcceptanceRequired;
+
+    /// <summary>
     /// Composes a supergraph from the given subgraph definitions.
     /// </summary>
     /// <param name="subgraphs">The list of subgraphs to compose.</param>
@@ -44,6 +50,9 @@ public sealed class CompositionRunner
                 Errors: new[] { "No subgraphs provided for composition." });
         }
 
+        // Check if ELv2 licence needs to be accepted
+        var acceptLicence = await EnsureLicenceAcceptanceAsync();
+
         // Create a temporary supergraph config file
         var configPath = Path.GetTempFileName();
         try
@@ -51,63 +60,9 @@ public sealed class CompositionRunner
             await WriteSupergraphConfigAsync(configPath, subgraphs, cancellationToken);
 
             // Execute: rover supergraph compose --config <path>
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = _roverPath,
-                Arguments = $"supergraph compose --config \"{configPath}\"",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
+            var result = await ExecuteRoverComposeAsync(configPath, cancellationToken, acceptLicence);
 
-            using var process = new Process { StartInfo = startInfo };
-            var outputBuilder = new StringBuilder();
-            var errorBuilder = new StringBuilder();
-
-            process.OutputDataReceived += (_, e) =>
-            {
-                if (e.Data != null) outputBuilder.AppendLine(e.Data);
-            };
-            process.ErrorDataReceived += (_, e) =>
-            {
-                if (e.Data != null) errorBuilder.AppendLine(e.Data);
-            };
-
-            try
-            {
-                process.Start();
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
-
-                await process.WaitForExitAsync(cancellationToken);
-
-                var output = outputBuilder.ToString();
-                var error = errorBuilder.ToString();
-
-                if (process.ExitCode == 0)
-                {
-                    // Success: output contains the supergraph SDL
-                    return new CompositionResult(
-                        Success: true,
-                        SupergraphSdl: output,
-                        Errors: Array.Empty<string>());
-                }
-                else
-                {
-                    // Failure: parse errors from stderr
-                    var errors = ParseCompositionErrors(error);
-                    return new CompositionResult(
-                        Success: false,
-                        SupergraphSdl: null,
-                        Errors: errors);
-                }
-            }
-            catch (Exception ex) when (ex is not OperationCanceledException)
-            {
-                throw new DevException(
-                    $"Failed to execute rover composition: {ex.Message}", ex);
-            }
+            return result;
         }
         finally
         {
@@ -175,5 +130,106 @@ public sealed class CompositionRunner
         return lines.Count > 0
             ? lines
             : new[] { "Composition failed with unknown error." };
+    }
+
+    /// <summary>
+    /// Executes the rover compose command.
+    /// </summary>
+    private async Task<CompositionResult> ExecuteRoverComposeAsync(
+        string configPath,
+        CancellationToken cancellationToken,
+        bool acceptLicence = false)
+    {
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = _roverPath,
+            Arguments = $"supergraph compose --config \"{configPath}\"",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        // Set environment variable to accept ELv2 licence
+        if (acceptLicence)
+        {
+            startInfo.Environment["APOLLO_ELV2_LICENSE"] = "accept";
+        }
+
+        using var process = new Process { StartInfo = startInfo };
+        var outputBuilder = new StringBuilder();
+        var errorBuilder = new StringBuilder();
+
+        process.OutputDataReceived += (_, e) =>
+        {
+            if (e.Data != null) outputBuilder.AppendLine(e.Data);
+        };
+        process.ErrorDataReceived += (_, e) =>
+        {
+            if (e.Data != null) errorBuilder.AppendLine(e.Data);
+        };
+
+        try
+        {
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+
+            await process.WaitForExitAsync(cancellationToken);
+
+            var output = outputBuilder.ToString();
+            var error = errorBuilder.ToString();
+
+            if (process.ExitCode == 0)
+            {
+                // Success: output contains the supergraph SDL
+                return new CompositionResult(
+                    Success: true,
+                    SupergraphSdl: output,
+                    Errors: Array.Empty<string>());
+            }
+            else
+            {
+                // Failure: parse errors from stderr
+                var errors = ParseCompositionErrors(error);
+                return new CompositionResult(
+                    Success: false,
+                    SupergraphSdl: null,
+                    Errors: errors);
+            }
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            throw new DevException(
+                $"Failed to execute rover composition: {ex.Message}", ex);
+        }
+    }
+
+    /// <summary>
+    /// Checks if the ELv2 licence has been accepted via environment variable.
+    /// If not, requests acceptance from the user.
+    /// </summary>
+    /// <returns>True if the licence should be accepted for this execution, false otherwise.</returns>
+    private async Task<bool> EnsureLicenceAcceptanceAsync()
+    {
+        // Check if the environment variable is already set
+        var envValue = Environment.GetEnvironmentVariable("APOLLO_ELV2_LICENSE");
+        if (string.Equals(envValue, "accept", StringComparison.OrdinalIgnoreCase))
+        {
+            return true; // Already accepted globally
+        }
+
+        // Not accepted yet - prompt the user
+        if (LicenceAcceptanceRequired == null)
+            return false; // No handler registered, decline by default
+
+        try
+        {
+            return await LicenceAcceptanceRequired.Invoke();
+        }
+        catch
+        {
+            return false; // On error, decline by default
+        }
     }
 }

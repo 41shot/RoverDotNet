@@ -63,6 +63,7 @@ public partial class DevForm : RoverOperationFormBase
             // Create and start session
             _session = new DevSession(configuration);
             _session.StateChanged += OnSessionStateChanged;
+            _session.LicenceAcceptanceRequired += OnLicenceAcceptanceRequired;
 
             LogMessage("Starting dev session...");
 
@@ -135,6 +136,39 @@ public partial class DevForm : RoverOperationFormBase
 
         // Update status label
         statusLabel.Text = $"Status: {e.State}";
+    }
+
+    private Task<bool> OnLicenceAcceptanceRequired()
+    {
+        // Ensure we're on the UI thread
+        if (InvokeRequired)
+        {
+            return Task.FromResult((bool)Invoke(() => OnLicenceAcceptanceRequired().Result));
+        }
+
+        var result = MessageBox.Show(
+            "The Apollo Router requires the Elastic License v2.0 (ELv2).\n\n" +
+            "By installing this plugin, you accept the terms and conditions outlined by this licence.\n\n" +
+            "More information on the ELv2 licence can be found here:\n" +
+            "https://go.apollo.dev/elv2\n\n" +
+            "Do you accept the terms and conditions of the ELv2 licence?",
+            "Licence Acceptance Required",
+            MessageBoxButtons.YesNo,
+            MessageBoxIcon.Question,
+            MessageBoxDefaultButton.Button2); // Default to No for safety
+
+        var accepted = result == DialogResult.Yes;
+
+        if (accepted)
+        {
+            LogMessage("ELv2 licence accepted by user. Installing router plugin...");
+        }
+        else
+        {
+            LogMessage("ELv2 licence declined by user.");
+        }
+
+        return Task.FromResult(accepted);
     }
 
     private void LogMessage(string message)

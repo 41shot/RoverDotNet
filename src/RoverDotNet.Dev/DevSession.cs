@@ -28,6 +28,12 @@ public sealed class DevSession : IDisposable
     public event EventHandler<DevSessionEvent>? StateChanged;
 
     /// <summary>
+    /// Raised when the ELv2 licence acceptance is required for the router plugin.
+    /// The handler should return true to accept the licence, false to decline.
+    /// </summary>
+    public event Func<Task<bool>>? LicenceAcceptanceRequired;
+
+    /// <summary>
     /// Gets the current state of the dev session.
     /// </summary>
     public DevSessionState State
@@ -54,6 +60,14 @@ public sealed class DevSession : IDisposable
         _watchers = new List<SubgraphWatcher>();
         _state = DevSessionState.Idle;
         _compositionLock = new SemaphoreSlim(1, 1);
+
+        // Forward licence acceptance requests
+        _compositionRunner.LicenceAcceptanceRequired += async () =>
+        {
+            if (LicenceAcceptanceRequired != null)
+                return await LicenceAcceptanceRequired.Invoke();
+            return false; // Decline by default if no handler is registered
+        };
 
         ValidateConfiguration();
     }
