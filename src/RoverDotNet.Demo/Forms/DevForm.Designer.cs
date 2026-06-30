@@ -33,7 +33,7 @@ namespace RoverDotNet.Demo.Forms
             titleLabel.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
             titleLabel.Location = new Point(12, 9);
             titleLabel.Name = "titleLabel";
-            titleLabel.Size = new Size(185, 25);
+            titleLabel.Size = new Size(174, 25);
             titleLabel.TabIndex = 0;
             titleLabel.Text = "Rover Dev Session";
             // 
@@ -42,7 +42,7 @@ namespace RoverDotNet.Demo.Forms
             subgraphsLabel.AutoSize = true;
             subgraphsLabel.Location = new Point(12, 50);
             subgraphsLabel.Name = "subgraphsLabel";
-            subgraphsLabel.Size = new Size(280, 15);
+            subgraphsLabel.Size = new Size(239, 15);
             subgraphsLabel.TabIndex = 1;
             subgraphsLabel.Text = "Subgraphs (format: name|url|schema_path):";
             // 
@@ -61,7 +61,7 @@ namespace RoverDotNet.Demo.Forms
             routerPortLabel.AutoSize = true;
             routerPortLabel.Location = new Point(12, 200);
             routerPortLabel.Name = "routerPortLabel";
-            routerPortLabel.Size = new Size(72, 15);
+            routerPortLabel.Size = new Size(70, 15);
             routerPortLabel.TabIndex = 3;
             routerPortLabel.Text = "Router Port:";
             // 
@@ -128,7 +128,7 @@ namespace RoverDotNet.Demo.Forms
             statusLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             statusLabel.Location = new Point(264, 245);
             statusLabel.Name = "statusLabel";
-            statusLabel.Size = new Size(71, 15);
+            statusLabel.Size = new Size(69, 15);
             statusLabel.TabIndex = 9;
             statusLabel.Text = "Status: Idle";
             // 
@@ -147,11 +147,9 @@ namespace RoverDotNet.Demo.Forms
             Controls.Add(subgraphsTextBox);
             Controls.Add(subgraphsLabel);
             Controls.Add(titleLabel);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
             Name = "DevForm";
-            StartPosition = FormStartPosition.CenterParent;
             Text = "Rover Dev Session";
+            FormClosing += DevForm_FormClosing;
             ResumeLayout(false);
             PerformLayout();
         }

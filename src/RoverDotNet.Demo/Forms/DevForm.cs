@@ -94,14 +94,7 @@ public partial class DevForm : RoverOperationFormBase
         {
             LogMessage("Stopping dev session...");
 
-            _cancellationTokenSource?.Cancel();
-
-            if (_session != null)
-            {
-                await _session.StopAsync();
-                _session.Dispose();
-                _session = null;
-            }
+            await StopDevSession();
 
             LogMessage("Dev session stopped.");
         }
@@ -112,6 +105,23 @@ public partial class DevForm : RoverOperationFormBase
         finally
         {
             ResetControls();
+        }
+    }
+
+    private async void DevForm_FormClosing(object sender, FormClosingEventArgs e)
+    {
+        await StopDevSession();
+    }
+
+    private async Task StopDevSession()
+    {
+        _cancellationTokenSource?.Cancel();
+
+        if (_session != null)
+        {
+            await _session.StopAsync();
+            _session.Dispose();
+            _session = null;
         }
     }
 

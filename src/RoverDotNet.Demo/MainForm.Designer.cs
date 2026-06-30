@@ -43,7 +43,7 @@
             profileLabel.AutoSize = true;
             profileLabel.Location = new Point(12, 67);
             profileLabel.Name = "profileLabel";
-            profileLabel.Size = new Size(143, 15);
+            profileLabel.Size = new Size(134, 15);
             profileLabel.TabIndex = 0;
             profileLabel.Text = "Profile Name (optional):";
             // 
@@ -103,7 +103,7 @@
             titleLabel.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
             titleLabel.Location = new Point(12, 18);
             titleLabel.Name = "titleLabel";
-            titleLabel.Size = new Size(184, 30);
+            titleLabel.Size = new Size(215, 30);
             titleLabel.TabIndex = 6;
             titleLabel.Text = "RoverDotNet Demo";
             // 

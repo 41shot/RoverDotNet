@@ -13,7 +13,7 @@ namespace RoverDotNet.Dev.Router;
 public sealed class RouterProcess : IDisposable
 {
     private const string DefaultHealthCheckUrl = "http://127.0.0.1:8088/health";
-    private static readonly Regex HealthCheckUrlPattern = new(@"Health check exposed at (http://[^\s]+)", RegexOptions.Compiled);
+    private static readonly Regex HealthCheckUrlPattern = new(@"Health check exposed at (http://[^\s]+/health)", RegexOptions.Compiled);
 
     private readonly string _routerBinaryPath;
     private readonly int _port;
@@ -89,6 +89,7 @@ public sealed class RouterProcess : IDisposable
         var startInfo = new ProcessStartInfo
         {
             FileName = _routerBinaryPath,
+            // TODO: Add argument for router configuration file if needed.
             Arguments = $"--supergraph \"{_supergraphSchemaPath}\" --hot-reload --dev --listen 127.0.0.1:{_port}",
             RedirectStandardOutput = true,
             RedirectStandardError = true,
@@ -133,7 +134,11 @@ public sealed class RouterProcess : IDisposable
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            // Clean up the process if startup fails
+            throw new RouterProcessException(
+                $"Failed to start router: {ex.Message}", ex);
+        }
+        finally
+        {
             try
             {
                 _process?.Kill();
@@ -144,9 +149,6 @@ public sealed class RouterProcess : IDisposable
             }
             _process?.Dispose();
             _process = null;
-
-            throw new RouterProcessException(
-                $"Failed to start router: {ex.Message}", ex);
         }
     }
 
