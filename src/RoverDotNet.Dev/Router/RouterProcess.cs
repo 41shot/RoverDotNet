@@ -1,8 +1,9 @@
+using RoverDotNet.Core.Extensions;
+using RoverDotNet.Dev.Exceptions;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
-using RoverDotNet.Dev.Exceptions;
 
 namespace RoverDotNet.Dev.Router;
 
@@ -13,11 +14,13 @@ namespace RoverDotNet.Dev.Router;
 public sealed class RouterProcess : IDisposable
 {
     private const string DefaultHealthCheckUrl = "http://127.0.0.1:8088/health";
-    private static readonly Regex HealthCheckUrlPattern = new(@"Health check exposed at (http://[^\s]+/health)", RegexOptions.Compiled);
+    private static readonly Regex HealthCheckUrlPattern
+        = new(@"Health check exposed at (http://[^\s]+/health)", RegexOptions.Compiled);
 
     private readonly string _routerBinaryPath;
     private readonly int _port;
     private string _supergraphSchemaPath;
+    private string? _routerConfigPath;
     private Process? _process;
     private bool _disposed;
     private string? _healthCheckUrl;
@@ -48,11 +51,13 @@ public sealed class RouterProcess : IDisposable
     /// <param name="routerBinaryPath">Path to the Apollo Router executable.</param>
     /// <param name="port">The port on which the router will listen.</param>
     /// <param name="supergraphSchemaPath">Path to the supergraph schema file.</param>
-    public RouterProcess(string routerBinaryPath, int port, string supergraphSchemaPath)
+    /// <param name="routerConfigPath">Path to the router configuration YAML file (optional).</param>
+    public RouterProcess(string routerBinaryPath, int port, string supergraphSchemaPath, string? routerConfigPath = null)
     {
         _routerBinaryPath = routerBinaryPath;
         _port = port;
         _supergraphSchemaPath = supergraphSchemaPath;
+        _routerConfigPath = routerConfigPath;
     }
 
     /// <summary>
@@ -86,11 +91,19 @@ public sealed class RouterProcess : IDisposable
                 $"Port {_port} is already in use. Choose a different port.");
         }
 
+        var routerArguments = new Dictionary<string, object?>
+        {
+            { "--supergraph", _supergraphSchemaPath },
+            { "--hot-reload", "" },
+            { "--dev", "" },
+            { "--listen", $"127.0.0.1:{_port}" },
+            { "--config", _routerConfigPath }
+        };
+
         var startInfo = new ProcessStartInfo
         {
             FileName = _routerBinaryPath,
-            // TODO: Add argument for router configuration file if needed.
-            Arguments = $"--supergraph \"{_supergraphSchemaPath}\" --hot-reload --dev --listen 127.0.0.1:{_port}",
+            Arguments = routerArguments.ToParametersString(),
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,

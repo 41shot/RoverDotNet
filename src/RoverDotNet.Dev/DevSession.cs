@@ -176,7 +176,8 @@ public sealed class DevSession : IDisposable
         _routerProcess = new RouterProcess(
             routerBinaryPath,
             _configuration.RouterPort,
-            _currentSupergraphPath!);
+            _currentSupergraphPath!,
+            _configuration.RouterConfigPath);
 
         _routerProcess.OutputReceived += (_, message) =>
             RaiseStateChanged(State, $"[Router] {message}");

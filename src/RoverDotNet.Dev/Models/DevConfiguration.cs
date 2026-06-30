@@ -15,9 +15,11 @@ namespace RoverDotNet.Dev.Models;
 /// <param name="SupergraphConfigPath">
 /// Optional path to save the composed supergraph schema. If null, a temporary file is used.
 /// </param>
+/// <param name="RouterConfigPath">Optional path to the router configuration YAML file.</param>
 public sealed record DevConfiguration(
     IReadOnlyList<SubgraphDefinition> Subgraphs,
     int RouterPort = 4000,
     int? SupergraphPort = null,
     string? RouterBinaryPath = null,
-    string? SupergraphConfigPath = null);
+    string? SupergraphConfigPath = null,
+    string? RouterConfigPath = null);
