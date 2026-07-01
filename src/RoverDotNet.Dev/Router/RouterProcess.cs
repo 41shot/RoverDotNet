@@ -145,12 +145,7 @@ public sealed class RouterProcess : IDisposable
             // Wait for the router to become ready (health check)
             await WaitForHealthCheckAsync(cancellationToken);
         }
-        catch (Exception ex) when (ex is not OperationCanceledException)
-        {
-            throw new RouterProcessException(
-                $"Failed to start router: {ex.Message}", ex);
-        }
-        finally
+        catch (Exception ex)
         {
             try
             {
@@ -162,6 +157,12 @@ public sealed class RouterProcess : IDisposable
             }
             _process?.Dispose();
             _process = null;
+
+            if (ex is OperationCanceledException)
+                throw;
+
+            throw new RouterProcessException(
+                $"Failed to start router: {ex.Message}", ex);
         }
     }
 
