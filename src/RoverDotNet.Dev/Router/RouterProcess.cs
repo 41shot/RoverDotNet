@@ -143,6 +143,7 @@ public sealed class RouterProcess : IDisposable
             _process.BeginErrorReadLine();
 
             // Wait for the router to become ready (health check)
+            await Task.Delay(500, cancellationToken);
             await WaitForHealthCheckAsync(cancellationToken);
         }
         catch (Exception ex)

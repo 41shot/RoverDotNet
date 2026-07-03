@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text;
+using RoverDotNet.Core.Config;
 using RoverDotNet.Dev.Exceptions;
 using RoverDotNet.Dev.Models;
 
@@ -153,7 +154,7 @@ public sealed class CompositionRunner
         // Set environment variable to accept ELv2 licence
         if (acceptLicence)
         {
-            startInfo.Environment["APOLLO_ELV2_LICENSE"] = "accept";
+            EnvironmentVariableHelper.SetValue("APOLLO_ELV2_LICENSE", "accept");
         }
 
         using var process = new Process { StartInfo = startInfo };
@@ -213,7 +214,7 @@ public sealed class CompositionRunner
     private async Task<bool> EnsureLicenceAcceptanceAsync()
     {
         // Check if the environment variable is already set
-        var envValue = Environment.GetEnvironmentVariable("APOLLO_ELV2_LICENSE");
+        var envValue = EnvironmentVariableHelper.GetValue("APOLLO_ELV2_LICENSE");
         if (string.Equals(envValue, "accept", StringComparison.OrdinalIgnoreCase))
         {
             return true; // Already accepted globally
