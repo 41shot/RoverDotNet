@@ -37,8 +37,8 @@ public partial class DevForm : RoverOperationFormBase
 
         // Add example subgraph entries with actual schema files
         var exampleText = "# Example subgraph configuration:\r\n"
-            + $"users|http://localhost:4001|{usersSchemaPath}\r\n"
-            + $"products|http://localhost:4002|{productsSchemaPath}\r\n"
+            + $"users|http://localhost:4001/graphql|{usersSchemaPath}\r\n"
+            + $"products|http://localhost:4002/graphql|{productsSchemaPath}\r\n"
             + "# Add more subgraphs in the format: name|url|schema_path\r\n";
 
         subgraphsTextBox.Text = exampleText;

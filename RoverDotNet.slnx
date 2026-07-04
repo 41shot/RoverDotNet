@@ -11,6 +11,12 @@
     <Project Path="src/RoverDotNet.Client/RoverDotNet.Client.csproj" />
     <Project Path="src/RoverDotNet.Config/RoverDotNet.Config.csproj" />
     <Project Path="src/RoverDotNet.Core/RoverDotNet.Core.csproj" />
+    <Project Path="src/RoverDotNet.Demo.Api.Products/RoverDotNet.Demo.Api.Products.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
+    <Project Path="src/RoverDotNet.Demo.Api.Users/RoverDotNet.Demo.Api.Users.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
     <Project Path="src/RoverDotNet.Demo/RoverDotNet.Demo.csproj" Id="3a2e11e2-0cec-476b-a86d-dbea71516bb7" />
     <Project Path="src/RoverDotNet.Dev/RoverDotNet.Dev.csproj" />
   </Folder>
