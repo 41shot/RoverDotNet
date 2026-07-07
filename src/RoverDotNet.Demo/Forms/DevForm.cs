@@ -57,6 +57,7 @@ public partial class DevForm : RoverOperationFormBase
             stopButton.Enabled = true;
             subgraphsTextBox.Enabled = false;
             routerPortTextBox.Enabled = false;
+            acceptElv2CheckBox.Enabled = false;
 
             _cancellationTokenSource = new CancellationTokenSource();
 
@@ -257,7 +258,10 @@ public partial class DevForm : RoverOperationFormBase
             subgraphs.Add(new SubgraphDefinition(name, url, schemaPath));
         }
 
-        return new DevConfiguration(subgraphs, RouterPort: port);
+        // Configure ELv2 licence acceptance
+        var elv2Licence = acceptElv2CheckBox.Checked ? "accept" : null;
+
+        return new DevConfiguration(subgraphs, RouterPort: port, Elv2Licence: elv2Licence);
     }
 
     private void ResetControls()
@@ -266,6 +270,7 @@ public partial class DevForm : RoverOperationFormBase
         stopButton.Enabled = false;
         subgraphsTextBox.Enabled = true;
         routerPortTextBox.Enabled = true;
+        acceptElv2CheckBox.Enabled = true;
     }
 
     protected override void Dispose(bool disposing)

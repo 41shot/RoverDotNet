@@ -20,6 +20,7 @@ namespace RoverDotNet.Demo.Forms
             subgraphsTextBox = new TextBox();
             routerPortLabel = new Label();
             routerPortTextBox = new TextBox();
+            acceptElv2CheckBox = new CheckBox();
             startButton = new Button();
             stopButton = new Button();
             outputLabel = new Label();
@@ -71,6 +72,16 @@ namespace RoverDotNet.Demo.Forms
             routerPortTextBox.Name = "routerPortTextBox";
             routerPortTextBox.Size = new Size(100, 23);
             routerPortTextBox.TabIndex = 4;
+            // 
+            // acceptElv2CheckBox
+            // 
+            acceptElv2CheckBox.AutoSize = true;
+            acceptElv2CheckBox.Location = new Point(200, 199);
+            acceptElv2CheckBox.Name = "acceptElv2CheckBox";
+            acceptElv2CheckBox.Size = new Size(124, 19);
+            acceptElv2CheckBox.TabIndex = 10;
+            acceptElv2CheckBox.Text = "Accept ELv2 licence";
+            acceptElv2CheckBox.UseVisualStyleBackColor = true;
             // 
             // startButton
             // 
@@ -137,6 +148,7 @@ namespace RoverDotNet.Demo.Forms
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(784, 514);
+            Controls.Add(acceptElv2CheckBox);
             Controls.Add(statusLabel);
             Controls.Add(outputTextBox);
             Controls.Add(outputLabel);
@@ -161,6 +173,7 @@ namespace RoverDotNet.Demo.Forms
         private TextBox subgraphsTextBox;
         private Label routerPortLabel;
         private TextBox routerPortTextBox;
+        private CheckBox acceptElv2CheckBox;
         private Button startButton;
         private Button stopButton;
         private Label outputLabel;

@@ -64,6 +64,13 @@ public sealed class DevSession : IDisposable
         // Forward licence acceptance requests
         _compositionRunner.LicenceAcceptanceRequired += async () =>
         {
+            // Check if licence is pre-accepted via configuration
+            if (!string.IsNullOrWhiteSpace(_configuration.Elv2Licence) &&
+                _configuration.Elv2Licence.Equals("accept", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
             if (LicenceAcceptanceRequired != null)
                 return await LicenceAcceptanceRequired.Invoke();
             return false; // Decline by default if no handler is registered
