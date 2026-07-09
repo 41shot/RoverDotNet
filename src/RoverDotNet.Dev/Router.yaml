@@ -1,0 +1,15 @@
+# Apollo Router Configuration
+# Propagates all headers from client requests to subgraph services
+
+headers:
+  # Propagate all headers to subgraphs
+  all:
+    request:
+      - propagate:
+          matching: ".*"
+
+# Optional: Configure telemetry
+telemetry:
+  instrumentation:
+    spans:
+      mode: spec_compliant

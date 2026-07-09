@@ -261,7 +261,8 @@ public partial class DevForm : RoverOperationFormBase
         // Configure ELv2 licence acceptance
         var elv2Licence = acceptElv2CheckBox.Checked ? "accept" : null;
 
-        return new DevConfiguration(subgraphs, RouterPort: port, Elv2Licence: elv2Licence);
+        return new DevConfiguration(
+            subgraphs, RouterPort: port, RouterConfigPath: "Router.yaml", Elv2Licence: elv2Licence);
     }
 
     private void ResetControls()

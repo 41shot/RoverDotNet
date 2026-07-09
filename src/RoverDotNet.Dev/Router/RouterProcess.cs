@@ -97,7 +97,8 @@ public sealed class RouterProcess : IDisposable
             { "--hot-reload", "" },
             { "--dev", "" },
             { "--listen", $"127.0.0.1:{_port}" },
-            { "--config", _routerConfigPath }
+            { "--config", _routerConfigPath },
+            { "--anonymous-telemetry-disabled", "" }
         };
 
         var startInfo = new ProcessStartInfo
@@ -110,8 +111,11 @@ public sealed class RouterProcess : IDisposable
             CreateNoWindow = true
         };
 
-        _process = new Process { StartInfo = startInfo };
-        _process.EnableRaisingEvents = true;
+        _process = new Process
+        {
+            StartInfo = startInfo,
+            EnableRaisingEvents = true
+        };
         _process.Exited += OnProcessExited;
 
         _process.OutputDataReceived += (_, e) =>

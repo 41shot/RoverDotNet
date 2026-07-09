@@ -21,4 +21,10 @@
     <ProjectReference Include="..\RoverDotNet.Client\RoverDotNet.Client.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Router.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
