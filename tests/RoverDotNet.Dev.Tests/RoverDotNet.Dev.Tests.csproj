@@ -22,4 +22,8 @@
     <ProjectReference Include="..\..\src\RoverDotNet.Dev\RoverDotNet.Dev.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Watchers\" />
+  </ItemGroup>
+
 </Project>

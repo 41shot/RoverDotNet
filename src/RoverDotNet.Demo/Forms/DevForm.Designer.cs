@@ -23,6 +23,7 @@ namespace RoverDotNet.Demo.Forms
             acceptElv2CheckBox = new CheckBox();
             startButton = new Button();
             stopButton = new Button();
+            saveConfigButton = new Button();
             outputLabel = new Label();
             outputTextBox = new TextBox();
             statusLabel = new Label();
@@ -43,24 +44,26 @@ namespace RoverDotNet.Demo.Forms
             subgraphsLabel.AutoSize = true;
             subgraphsLabel.Location = new Point(12, 50);
             subgraphsLabel.Name = "subgraphsLabel";
-            subgraphsLabel.Size = new Size(239, 15);
+            subgraphsLabel.Size = new Size(190, 15);
             subgraphsLabel.TabIndex = 1;
-            subgraphsLabel.Text = "Subgraphs (format: name|url|schema_path):";
+            subgraphsLabel.Text = "Supergraph Configuration (YAML):";
             // 
             // subgraphsTextBox
             // 
+            subgraphsTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             subgraphsTextBox.Font = new Font("Consolas", 9F);
             subgraphsTextBox.Location = new Point(12, 68);
             subgraphsTextBox.Multiline = true;
             subgraphsTextBox.Name = "subgraphsTextBox";
             subgraphsTextBox.ScrollBars = ScrollBars.Vertical;
-            subgraphsTextBox.Size = new Size(760, 120);
+            subgraphsTextBox.Size = new Size(760, 207);
             subgraphsTextBox.TabIndex = 2;
             // 
             // routerPortLabel
             // 
+            routerPortLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             routerPortLabel.AutoSize = true;
-            routerPortLabel.Location = new Point(12, 200);
+            routerPortLabel.Location = new Point(12, 287);
             routerPortLabel.Name = "routerPortLabel";
             routerPortLabel.Size = new Size(70, 15);
             routerPortLabel.TabIndex = 3;
@@ -68,27 +71,30 @@ namespace RoverDotNet.Demo.Forms
             // 
             // routerPortTextBox
             // 
-            routerPortTextBox.Location = new Point(90, 197);
+            routerPortTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            routerPortTextBox.Location = new Point(90, 284);
             routerPortTextBox.Name = "routerPortTextBox";
             routerPortTextBox.Size = new Size(100, 23);
             routerPortTextBox.TabIndex = 4;
             // 
             // acceptElv2CheckBox
             // 
+            acceptElv2CheckBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             acceptElv2CheckBox.AutoSize = true;
-            acceptElv2CheckBox.Location = new Point(200, 199);
+            acceptElv2CheckBox.Location = new Point(200, 286);
             acceptElv2CheckBox.Name = "acceptElv2CheckBox";
-            acceptElv2CheckBox.Size = new Size(124, 19);
+            acceptElv2CheckBox.Size = new Size(129, 19);
             acceptElv2CheckBox.TabIndex = 10;
             acceptElv2CheckBox.Text = "Accept ELv2 licence";
             acceptElv2CheckBox.UseVisualStyleBackColor = true;
             // 
             // startButton
             // 
+            startButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             startButton.BackColor = Color.FromArgb(0, 120, 215);
             startButton.FlatStyle = FlatStyle.Flat;
             startButton.ForeColor = Color.White;
-            startButton.Location = new Point(12, 236);
+            startButton.Location = new Point(12, 323);
             startButton.Name = "startButton";
             startButton.Size = new Size(120, 35);
             startButton.TabIndex = 5;
@@ -98,11 +104,12 @@ namespace RoverDotNet.Demo.Forms
             // 
             // stopButton
             // 
+            stopButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             stopButton.BackColor = Color.FromArgb(232, 17, 35);
             stopButton.Enabled = false;
             stopButton.FlatStyle = FlatStyle.Flat;
             stopButton.ForeColor = Color.White;
-            stopButton.Location = new Point(138, 236);
+            stopButton.Location = new Point(138, 323);
             stopButton.Name = "stopButton";
             stopButton.Size = new Size(120, 35);
             stopButton.TabIndex = 6;
@@ -110,10 +117,23 @@ namespace RoverDotNet.Demo.Forms
             stopButton.UseVisualStyleBackColor = false;
             stopButton.Click += stopButton_Click;
             // 
+            // saveConfigButton
+            // 
+            saveConfigButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            saveConfigButton.Enabled = false;
+            saveConfigButton.Location = new Point(678, 284);
+            saveConfigButton.Name = "saveConfigButton";
+            saveConfigButton.Size = new Size(94, 23);
+            saveConfigButton.TabIndex = 11;
+            saveConfigButton.Text = "Update Config";
+            saveConfigButton.UseVisualStyleBackColor = true;
+            saveConfigButton.Click += saveConfigButton_Click;
+            // 
             // outputLabel
             // 
+            outputLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             outputLabel.AutoSize = true;
-            outputLabel.Location = new Point(12, 284);
+            outputLabel.Location = new Point(12, 371);
             outputLabel.Name = "outputLabel";
             outputLabel.Size = new Size(48, 15);
             outputLabel.TabIndex = 7;
@@ -121,10 +141,11 @@ namespace RoverDotNet.Demo.Forms
             // 
             // outputTextBox
             // 
+            outputTextBox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             outputTextBox.BackColor = Color.Black;
             outputTextBox.Font = new Font("Consolas", 9F);
             outputTextBox.ForeColor = Color.LimeGreen;
-            outputTextBox.Location = new Point(12, 302);
+            outputTextBox.Location = new Point(12, 389);
             outputTextBox.Multiline = true;
             outputTextBox.Name = "outputTextBox";
             outputTextBox.ReadOnly = true;
@@ -135,9 +156,10 @@ namespace RoverDotNet.Demo.Forms
             // 
             // statusLabel
             // 
+            statusLabel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             statusLabel.AutoSize = true;
             statusLabel.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            statusLabel.Location = new Point(264, 245);
+            statusLabel.Location = new Point(264, 332);
             statusLabel.Name = "statusLabel";
             statusLabel.Size = new Size(69, 15);
             statusLabel.TabIndex = 9;
@@ -147,7 +169,8 @@ namespace RoverDotNet.Demo.Forms
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(784, 514);
+            ClientSize = new Size(784, 601);
+            Controls.Add(saveConfigButton);
             Controls.Add(acceptElv2CheckBox);
             Controls.Add(statusLabel);
             Controls.Add(outputTextBox);
@@ -179,5 +202,6 @@ namespace RoverDotNet.Demo.Forms
         private Label outputLabel;
         private TextBox outputTextBox;
         private Label statusLabel;
+        private Button saveConfigButton;
     }
 }

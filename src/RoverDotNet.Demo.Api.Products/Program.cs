@@ -7,6 +7,7 @@ builder.Services.AddSingleton<ProductRepository>();
 
 builder.Services
     .AddGraphQLServer()
+    .AddApolloFederation()
     .AddQueryType<Query>()
     .AddMutationType<Mutation>()
     .AddType<ProductType>()

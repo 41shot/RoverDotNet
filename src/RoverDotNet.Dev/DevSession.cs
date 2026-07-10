@@ -2,7 +2,6 @@ using RoverDotNet.Dev.Composition;
 using RoverDotNet.Dev.Exceptions;
 using RoverDotNet.Dev.Models;
 using RoverDotNet.Dev.Router;
-using RoverDotNet.Dev.Watchers;
 
 namespace RoverDotNet.Dev;
 
@@ -15,9 +14,10 @@ public sealed class DevSession : IDisposable
 {
     private readonly DevConfiguration _configuration;
     private readonly CompositionRunner _compositionRunner;
-    private readonly List<SubgraphWatcher> _watchers;
     private RouterProcess? _routerProcess;
+    private string? _supergraphConfigPath;
     private string? _currentSupergraphPath;
+    private FileSystemWatcher? _configWatcher;
     private DevSessionState _state;
     private bool _disposed;
     private readonly SemaphoreSlim _compositionLock;
@@ -57,7 +57,6 @@ public sealed class DevSession : IDisposable
     {
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         _compositionRunner = compositionRunner ?? new CompositionRunner();
-        _watchers = new List<SubgraphWatcher>();
         _state = DevSessionState.Idle;
         _compositionLock = new SemaphoreSlim(1, 1);
 
@@ -95,10 +94,13 @@ public sealed class DevSession : IDisposable
         {
             State = DevSessionState.Starting;
 
+            // Prepare supergraph config file path
+            _supergraphConfigPath = await PrepareSupergraphConfigAsync(cancellationToken);
+
             // Initial composition
             RaiseStateChanged(DevSessionState.Starting, "Performing initial supergraph composition...");
             var compositionResult = await _compositionRunner.ComposeAsync(
-                _configuration.Subgraphs,
+                _supergraphConfigPath,
                 cancellationToken);
 
             if (!compositionResult.Success)
@@ -108,7 +110,7 @@ public sealed class DevSession : IDisposable
             }
 
             // Write supergraph to file
-            _currentSupergraphPath = _configuration.SupergraphConfigPath
+            _currentSupergraphPath = _configuration.ComposedSupergraphPath
                 ?? Path.Combine(Path.GetTempPath(), $"supergraph-{Guid.NewGuid()}.graphql");
 
             await File.WriteAllTextAsync(
@@ -121,7 +123,7 @@ public sealed class DevSession : IDisposable
             // Start the router
             await StartRouterAsync(cancellationToken);
 
-            // Start watching subgraphs
+            // Start watching supergraph config file for changes
             StartWatching();
 
             State = DevSessionState.Running;
@@ -218,55 +220,66 @@ public sealed class DevSession : IDisposable
 
     private void StartWatching()
     {
-        foreach (var subgraph in _configuration.Subgraphs)
-        {
-            var watcher = new SubgraphWatcher(subgraph);
-            watcher.SchemaChanged += OnSchemaChanged;
-            watcher.Start();
-            _watchers.Add(watcher);
-        }
+        if (_supergraphConfigPath == null)
+            return;
 
-        RaiseStateChanged(State, $"Watching {_watchers.Count} subgraph(s) for changes...");
+        var directory = Path.GetDirectoryName(_supergraphConfigPath);
+        var fileName = Path.GetFileName(_supergraphConfigPath);
+
+        if (string.IsNullOrEmpty(directory) || string.IsNullOrEmpty(fileName))
+            return;
+
+        _configWatcher = new FileSystemWatcher(directory, fileName)
+        {
+            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size
+        };
+
+        _configWatcher.Changed += OnSupergraphConfigChanged;
+        _configWatcher.EnableRaisingEvents = true;
+
+        RaiseStateChanged(State, $"Watching supergraph config for changes: {_supergraphConfigPath}");
     }
 
     private void StopWatching()
     {
-        foreach (var watcher in _watchers)
+        if (_configWatcher != null)
         {
-            watcher.SchemaChanged -= OnSchemaChanged;
-            watcher.Stop();
-            watcher.Dispose();
+            _configWatcher.Changed -= OnSupergraphConfigChanged;
+            _configWatcher.Dispose();
+            _configWatcher = null;
         }
-        _watchers.Clear();
     }
 
-    private async void OnSchemaChanged(object? sender, SubgraphDefinition subgraph)
+    private async void OnSupergraphConfigChanged(object sender, FileSystemEventArgs e)
     {
         // Prevent concurrent recomposition
         if (!await _compositionLock.WaitAsync(0))
         {
-            RaiseStateChanged(State, $"Ignoring change to {subgraph.Name} (recomposition already in progress).");
+            // Ignoring config change (recomposition already in progress).
             return;
         }
 
         try
         {
+            // Debounce: wait a bit to ensure file write is complete
+            await Task.Delay(500);
+
             var previousState = State;
             State = DevSessionState.Composing;
 
             RaiseStateChanged(
                 DevSessionState.Composing,
-                $"Schema changed: {subgraph.Name}. Recomposing supergraph...");
+                "Supergraph config changed. Recomposing supergraph...");
 
             var compositionResult = await _compositionRunner.ComposeAsync(
-                _configuration.Subgraphs,
+                _supergraphConfigPath!,
                 CancellationToken.None);
 
             if (!compositionResult.Success)
             {
                 RaiseStateChanged(
                     previousState,
-                    $"Composition failed after change to {subgraph.Name}. Errors: {string.Join("; ", compositionResult.Errors)}");
+                    $"Composition failed after config change. Errors: {string.Join("; ", compositionResult.Errors)}");
                 State = previousState;
                 return;
             }
@@ -287,14 +300,14 @@ public sealed class DevSession : IDisposable
             State = DevSessionState.Running;
             RaiseStateChanged(
                 DevSessionState.Running,
-                $"Supergraph recomposed and router restarted after change to {subgraph.Name}.");
+                "Supergraph recomposed and router restarted after config change.");
         }
         catch (Exception ex)
         {
             State = DevSessionState.Error;
             RaiseStateChanged(
                 DevSessionState.Error,
-                $"Error handling schema change for {subgraph.Name}: {ex.Message}",
+                $"Error handling config change: {ex.Message}",
                 ex);
         }
         finally
@@ -303,22 +316,50 @@ public sealed class DevSession : IDisposable
         }
     }
 
+    private async Task<string> PrepareSupergraphConfigAsync(CancellationToken cancellationToken)
+    {
+        // If a file path is provided, use it directly
+        if (!string.IsNullOrWhiteSpace(_configuration.SupergraphConfigPath))
+        {
+            if (!File.Exists(_configuration.SupergraphConfigPath))
+            {
+                throw new ArgumentException(
+                    $"Supergraph config file not found: {_configuration.SupergraphConfigPath}",
+                    nameof(_configuration));
+            }
+
+            return _configuration.SupergraphConfigPath;
+        }
+
+        // Otherwise, write the content to a temp file
+        if (!string.IsNullOrWhiteSpace(_configuration.SupergraphConfigContent))
+        {
+            var tempPath = Path.Combine(Path.GetTempPath(), $"supergraph-config-{Guid.NewGuid()}.yaml");
+            await File.WriteAllTextAsync(tempPath, _configuration.SupergraphConfigContent, cancellationToken);
+
+            return tempPath;
+        }
+
+        throw new ArgumentException(
+            "Either SupergraphConfigPath or SupergraphConfigContent must be provided.",
+            nameof(_configuration));
+    }
+
     private void ValidateConfiguration()
     {
-        if (_configuration.Subgraphs.Count == 0)
-            throw new ArgumentException("At least one subgraph must be provided.", nameof(_configuration));
-
-        var uniqueNames = new HashSet<string>();
-        foreach (var subgraph in _configuration.Subgraphs)
+        if (string.IsNullOrWhiteSpace(_configuration.SupergraphConfigPath) &&
+            string.IsNullOrWhiteSpace(_configuration.SupergraphConfigContent))
         {
-            if (string.IsNullOrWhiteSpace(subgraph.Name))
-                throw new ArgumentException("Subgraph name cannot be empty.");
+            throw new ArgumentException(
+                "Either SupergraphConfigPath or SupergraphConfigContent must be provided.",
+                nameof(_configuration));
+        }
 
-            if (!uniqueNames.Add(subgraph.Name))
-                throw new ArgumentException($"Duplicate subgraph name: {subgraph.Name}");
-
-            if (!File.Exists(subgraph.SchemaPath))
-                throw new ArgumentException($"Schema file not found: {subgraph.SchemaPath}");
+        if (_configuration.RouterPort < 1 || _configuration.RouterPort > 65535)
+        {
+            throw new ArgumentException(
+                "RouterPort must be between 1 and 65535.",
+                nameof(_configuration));
         }
     }
 
@@ -362,9 +403,24 @@ public sealed class DevSession : IDisposable
         _routerProcess?.Dispose();
         _compositionLock.Dispose();
 
-        // Clean up temporary supergraph file if we created one
-        if (_currentSupergraphPath is not null
+        // Clean up temporary supergraph config file if we created one
+        if (_supergraphConfigPath is not null
             && _configuration.SupergraphConfigPath is null
+            && File.Exists(_supergraphConfigPath))
+        {
+            try
+            {
+                File.Delete(_supergraphConfigPath);
+            }
+            catch
+            {
+                // Ignore cleanup errors
+            }
+        }
+
+        // Clean up temporary composed supergraph file if we created one
+        if (_currentSupergraphPath is not null
+            && _configuration.ComposedSupergraphPath is null
             && File.Exists(_currentSupergraphPath))
         {
             try

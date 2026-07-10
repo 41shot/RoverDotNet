@@ -7,6 +7,7 @@ builder.Services.AddSingleton<UserRepository>();
 
 builder.Services
     .AddGraphQLServer()
+    .AddApolloFederation()
     .AddQueryType<Query>()
     .AddMutationType<Mutation>()
     .AddType<UserType>();

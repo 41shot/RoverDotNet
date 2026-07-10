@@ -7,7 +7,6 @@ public class ProductType : ObjectType<Product>
     protected override void Configure(IObjectTypeDescriptor<Product> descriptor)
     {
         descriptor.Name("Product");
-        descriptor.ImplementsNode().IdField(p => p.Id).ResolveNode((ctx, id) => Task.FromResult<Product?>(null));
 
         descriptor
             .Field(p => p.Id)
@@ -43,7 +42,7 @@ public class ProductType : ObjectType<Product>
 
         descriptor
             .Field(p => p.CreatedBy)
-            .Type<UserType>();
+            .Type<ObjectType<User>>();
 
         descriptor
             .Field(p => p.CreatedAt)
@@ -54,18 +53,5 @@ public class ProductType : ObjectType<Product>
             .Field(p => p.UpdatedAt)
             .Type<NonNullType<StringType>>()
             .Resolve(ctx => ctx.Parent<Product>().UpdatedAt.ToString("O"));
-    }
-}
-
-public class UserType : ObjectType<User>
-{
-    protected override void Configure(IObjectTypeDescriptor<User> descriptor)
-    {
-        descriptor.Name("User");
-        descriptor.ImplementsNode().IdField(u => u.Id).ResolveNode((ctx, id) => Task.FromResult<User?>(null));
-
-        descriptor
-            .Field(u => u.Id)
-            .Type<NonNullType<IdType>>();
     }
 }

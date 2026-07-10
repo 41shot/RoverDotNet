@@ -1,3 +1,5 @@
+using RoverDotNet.Demo.Api.Products.GraphQL;
+
 namespace RoverDotNet.Demo.Api.Products.Models;
 
 public class Product
@@ -13,11 +15,6 @@ public class Product
     public User? CreatedBy { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-}
-
-public class User
-{
-    public string Id { get; set; } = string.Empty;
 }
 
 public enum ProductCategory

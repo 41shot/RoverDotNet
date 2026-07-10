@@ -1,0 +1,19 @@
+federation_version: =2.6.0
+subgraphs:
+  users:
+    routing_url: http://localhost:4001/graphql
+    schema:
+      # Option 1: Introspect from running subgraph (recommended for development)
+      subgraph_url: http://localhost:4001/graphql?sdl
+
+      # Option 2: Use local schema file (if subgraphs aren't running)
+      # file: ./Schemas/users.graphql
+
+  products:
+    routing_url: http://localhost:4002/graphql
+    schema:
+      # Option 1: Introspect from running subgraph (recommended for development)
+      subgraph_url: http://localhost:4002/graphql?sdl
+
+      # Option 2: Use local schema file (if subgraphs aren't running)
+      # file: ./Schemas/products.graphql

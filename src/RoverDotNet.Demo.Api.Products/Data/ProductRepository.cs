@@ -1,3 +1,4 @@
+using RoverDotNet.Demo.Api.Products.GraphQL;
 using RoverDotNet.Demo.Api.Products.Models;
 
 namespace RoverDotNet.Demo.Api.Products.Data;

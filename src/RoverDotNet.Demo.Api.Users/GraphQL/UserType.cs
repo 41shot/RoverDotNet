@@ -1,3 +1,4 @@
+using HotChocolate.ApolloFederation.Types;
 using RoverDotNet.Demo.Api.Users.Models;
 
 namespace RoverDotNet.Demo.Api.Users.GraphQL;
@@ -7,7 +8,7 @@ public class UserType : ObjectType<User>
     protected override void Configure(IObjectTypeDescriptor<User> descriptor)
     {
         descriptor.Name("User");
-        descriptor.ImplementsNode().IdField(u => u.Id).ResolveNode((ctx, id) => Task.FromResult<User?>(null));
+        descriptor.Key("id");
 
         descriptor
             .Field(u => u.Id)

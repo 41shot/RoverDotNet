@@ -3,13 +3,22 @@ namespace RoverDotNet.Dev.Models;
 /// <summary>
 /// Configuration for a <see cref="DevSession"/>.
 /// </summary>
-/// <param name="Subgraphs">The list of subgraphs to compose and watch.</param>
+/// <param name="SupergraphConfigPath">
+/// Path to an existing supergraph configuration YAML file. 
+/// This file should follow rover's supergraph config format.
+/// If null, SupergraphConfigContent must be provided.
+/// </param>
+/// <param name="SupergraphConfigContent">
+/// Raw YAML content of the supergraph configuration.
+/// Used when the config is provided as a string instead of a file path.
+/// Will be written to a temporary file. If null, SupergraphConfigPath must be provided.
+/// </param>
 /// <param name="RouterPort">The port on which the Apollo Router will listen (default: 4000).</param>
 /// <param name="RouterBinaryPath">
 /// Optional path to the Apollo Router binary. If null, the system will attempt to download
 /// or locate the router automatically.
 /// </param>
-/// <param name="SupergraphConfigPath">
+/// <param name="ComposedSupergraphPath">
 /// Optional path to save the composed supergraph schema. If null, a temporary file is used.
 /// </param>
 /// <param name="RouterConfigPath">Optional path to the router configuration YAML file.</param>
@@ -18,9 +27,10 @@ namespace RoverDotNet.Dev.Models;
 /// the licence acceptance prompt will be suppressed and automatically accepted.
 /// </param>
 public sealed record DevConfiguration(
-    IReadOnlyList<SubgraphDefinition> Subgraphs,
+    string? SupergraphConfigPath = null,
+    string? SupergraphConfigContent = null,
     int RouterPort = 4000,
     string? RouterBinaryPath = null,
-    string? SupergraphConfigPath = null,
+    string? ComposedSupergraphPath = null,
     string? RouterConfigPath = null,
     string? Elv2Licence = null);

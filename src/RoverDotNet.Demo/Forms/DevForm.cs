@@ -11,6 +11,7 @@ public partial class DevForm : RoverOperationFormBase
 {
     private DevSession? _session;
     private CancellationTokenSource? _cancellationTokenSource;
+    private string? _tempSupergraphConfigPath;
 
     public DevForm()
     {
@@ -24,24 +25,36 @@ public partial class DevForm : RoverOperationFormBase
         // Set default values
         routerPortTextBox.Text = "4000";
 
-        // Add sample subgraph
-        AddSampleSubgraphs();
+        // Load default supergraph config
+        LoadDefaultSupergraphConfig();
     }
 
-    private void AddSampleSubgraphs()
+    private void LoadDefaultSupergraphConfig()
     {
-        // Get the path to the schema files in the output directory
+        // Try to load Supergraph.yaml from the application directory
         var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        var usersSchemaPath = Path.Combine(baseDirectory, "Schemas", "users.graphql");
-        var productsSchemaPath = Path.Combine(baseDirectory, "Schemas", "products.graphql");
+        var supergraphConfigPath = Path.Combine(baseDirectory, "Supergraph.yaml");
 
-        // Add example subgraph entries with actual schema files
-        var exampleText = "# Example subgraph configuration:\r\n"
-            + $"users|http://localhost:4001/graphql|{usersSchemaPath}\r\n"
-            + $"products|http://localhost:4002/graphql|{productsSchemaPath}\r\n"
-            + "# Add more subgraphs in the format: name|url|schema_path\r\n";
+        subgraphsTextBox.Text = @"# Apollo Supergraph Configuration" + Environment.NewLine;
+        subgraphsTextBox.AppendText(
+            "# This file defines the subgraphs that make up your federated GraphQL API." + Environment.NewLine);
+        subgraphsTextBox.AppendText(
+            "# For more information, see: https://www.apollographql.com/docs/rover/commands/supergraphs/" + Environment.NewLine);
+        subgraphsTextBox.AppendText(Environment.NewLine);
 
-        subgraphsTextBox.Text = exampleText;
+        if (File.Exists(supergraphConfigPath))
+        {
+            try
+            {
+                var content = File.ReadAllText(supergraphConfigPath);
+                subgraphsTextBox.AppendText(content);
+                LogMessage($"Loaded default supergraph config from: {supergraphConfigPath}");
+            }
+            catch (Exception ex)
+            {
+                LogMessage($"Warning: Could not load Supergraph.yaml: {ex.Message}");
+            }
+        }
     }
 
     private async void startButton_Click(object sender, EventArgs e)
@@ -55,9 +68,9 @@ public partial class DevForm : RoverOperationFormBase
             // Disable controls
             startButton.Enabled = false;
             stopButton.Enabled = true;
-            subgraphsTextBox.Enabled = false;
             routerPortTextBox.Enabled = false;
             acceptElv2CheckBox.Enabled = false;
+            saveConfigButton.Enabled = true;
 
             _cancellationTokenSource = new CancellationTokenSource();
 
@@ -86,6 +99,34 @@ public partial class DevForm : RoverOperationFormBase
         {
             LogMessage($"UNEXPECTED ERROR: {ex.Message}");
             ResetControls();
+        }
+    }
+
+    private async void saveConfigButton_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(_tempSupergraphConfigPath))
+            {
+                LogMessage("No active session. Save button is only available during a session.");
+                return;
+            }
+
+            if (!File.Exists(_tempSupergraphConfigPath))
+            {
+                LogMessage($"Error: Temp config file not found: {_tempSupergraphConfigPath}");
+                return;
+            }
+
+            // Write the current text box content to the temp file
+            var content = subgraphsTextBox.Text;
+            await File.WriteAllTextAsync(_tempSupergraphConfigPath, content);
+
+            LogMessage("Supergraph configuration updated. The session will detect changes and recompose...");
+        }
+        catch (Exception ex)
+        {
+            LogMessage($"ERROR saving config: {ex.Message}");
         }
     }
 
@@ -123,6 +164,20 @@ public partial class DevForm : RoverOperationFormBase
             await _session.StopAsync();
             _session.Dispose();
             _session = null;
+        }
+
+        // Clean up temp config file
+        if (_tempSupergraphConfigPath != null && File.Exists(_tempSupergraphConfigPath))
+        {
+            try
+            {
+                File.Delete(_tempSupergraphConfigPath);
+            }
+            catch
+            {
+                // Ignore cleanup errors
+            }
+            _tempSupergraphConfigPath = null;
         }
     }
 
@@ -202,67 +257,44 @@ public partial class DevForm : RoverOperationFormBase
             return null;
         }
 
-        // Parse subgraphs
-        var subgraphs = new List<SubgraphDefinition>();
-        var lines = subgraphsTextBox.Lines
-            .Where(line => !string.IsNullOrWhiteSpace(line) && !line.TrimStart().StartsWith("#"))
-            .ToArray();
-
-        if (lines.Length == 0)
+        // Validate YAML content
+        var yamlContent = subgraphsTextBox.Text;
+        if (string.IsNullOrWhiteSpace(yamlContent))
         {
             MessageBox.Show(
-                "Please add at least one subgraph.\n\nFormat: name|url|schema_path",
-                "No Subgraphs",
+                "Please provide an Apollo supergraph configuration in YAML format.",
+                "No Configuration",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Warning);
             return null;
         }
 
-        foreach (var line in lines)
+        // Write content to a temporary file and track it
+        _tempSupergraphConfigPath = Path.Combine(Path.GetTempPath(), $"supergraph-config-{Guid.NewGuid()}.yaml");
+
+        try
         {
-            var parts = line.Split('|');
-            if (parts.Length != 3)
-            {
-                MessageBox.Show(
-                    $"Invalid subgraph format: {line}\n\nExpected format: name|url|schema_path",
-                    "Invalid Subgraph",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-                return null;
-            }
+            File.WriteAllText(_tempSupergraphConfigPath, yamlContent);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"Failed to write temporary config file: {ex.Message}",
+                "File Error",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
 
-            var name = parts[0].Trim();
-            var url = parts[1].Trim();
-            var schemaPath = parts[2].Trim();
-
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(url) || string.IsNullOrEmpty(schemaPath))
-            {
-                MessageBox.Show(
-                    $"Invalid subgraph (empty fields): {line}",
-                    "Invalid Subgraph",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-                return null;
-            }
-
-            if (!File.Exists(schemaPath))
-            {
-                MessageBox.Show(
-                    $"Schema file not found: {schemaPath}\n\nSubgraph: {name}",
-                    "File Not Found",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-                return null;
-            }
-
-            subgraphs.Add(new SubgraphDefinition(name, url, schemaPath));
+            return null;
         }
 
         // Configure ELv2 licence acceptance
         var elv2Licence = acceptElv2CheckBox.Checked ? "accept" : null;
 
         return new DevConfiguration(
-            subgraphs, RouterPort: port, RouterConfigPath: "Router.yaml", Elv2Licence: elv2Licence);
+            SupergraphConfigPath: _tempSupergraphConfigPath,
+            RouterPort: port,
+            RouterConfigPath: "Router.yaml",
+            Elv2Licence: elv2Licence);
     }
 
     private void ResetControls()
@@ -272,6 +304,7 @@ public partial class DevForm : RoverOperationFormBase
         subgraphsTextBox.Enabled = true;
         routerPortTextBox.Enabled = true;
         acceptElv2CheckBox.Enabled = true;
+        saveConfigButton.Enabled = false;
     }
 
     protected override void Dispose(bool disposing)

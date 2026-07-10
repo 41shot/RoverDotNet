@@ -7,7 +7,7 @@ using RoverDotNet.Dev.Models;
 namespace RoverDotNet.Dev.Composition;
 
 /// <summary>
-/// Wraps <c>rover supergraph compose</c> to generate a supergraph schema from subgraph definitions.
+/// Wraps <c>rover supergraph compose</c> to generate a supergraph schema from a supergraph config file.
 /// Mirrors the composition logic in <c>src/composition/supergraph/</c>.
 /// </summary>
 public sealed class CompositionRunner
@@ -33,84 +33,39 @@ public sealed class CompositionRunner
     public event Func<Task<bool>>? LicenceAcceptanceRequired;
 
     /// <summary>
-    /// Composes a supergraph from the given subgraph definitions.
+    /// Composes a supergraph from a supergraph configuration file.
     /// </summary>
-    /// <param name="subgraphs">The list of subgraphs to compose.</param>
+    /// <param name="supergraphConfigPath">Path to the supergraph configuration YAML file.</param>
     /// <param name="cancellationToken">Propagates cancellation.</param>
     /// <returns>A <see cref="CompositionResult"/> containing the supergraph SDL or errors.</returns>
     /// <exception cref="DevException">Thrown if rover.exe cannot be executed.</exception>
     public async Task<CompositionResult> ComposeAsync(
-        IReadOnlyList<SubgraphDefinition> subgraphs,
+        string supergraphConfigPath,
         CancellationToken cancellationToken = default)
     {
-        if (subgraphs.Count == 0)
+        if (string.IsNullOrWhiteSpace(supergraphConfigPath))
         {
             return new CompositionResult(
                 Success: false,
                 SupergraphSdl: null,
-                Errors: new[] { "No subgraphs provided for composition." });
+                Errors: new[] { "Supergraph config path is required." });
+        }
+
+        if (!File.Exists(supergraphConfigPath))
+        {
+            return new CompositionResult(
+                Success: false,
+                SupergraphSdl: null,
+                Errors: new[] { $"Supergraph config file not found: {supergraphConfigPath}" });
         }
 
         // Check if ELv2 licence needs to be accepted
         var acceptLicence = await EnsureLicenceAcceptanceAsync();
 
-        // Create a temporary supergraph config file
-        var configPath = Path.GetTempFileName();
-        try
-        {
-            await WriteSupergraphConfigAsync(configPath, subgraphs, cancellationToken);
+        // Execute: rover supergraph compose --config <path>
+        var result = await ExecuteRoverComposeAsync(supergraphConfigPath, cancellationToken, acceptLicence);
 
-            // Execute: rover supergraph compose --config <path>
-            var result = await ExecuteRoverComposeAsync(configPath, cancellationToken, acceptLicence);
-
-            return result;
-        }
-        finally
-        {
-            // Clean up temporary config file
-            try
-            {
-                if (File.Exists(configPath))
-                    File.Delete(configPath);
-            }
-            catch
-            {
-                // Ignore cleanup errors
-            }
-        }
-    }
-
-    /// <summary>
-    /// Writes a supergraph config YAML file for rover.
-    /// Format:
-    /// federation_version: =2.4.0
-    /// subgraphs:
-    ///   subgraph-name:
-    ///     routing_url: http://...
-    ///     schema:
-    ///       file: ./path/to/schema.graphql
-    /// </summary>
-    private static async Task WriteSupergraphConfigAsync(
-        string configPath,
-        IReadOnlyList<SubgraphDefinition> subgraphs,
-        CancellationToken cancellationToken)
-    {
-        var yaml = new StringBuilder();
-        yaml.AppendLine("federation_version: =2.4.0");
-        yaml.AppendLine("subgraphs:");
-
-        foreach (var subgraph in subgraphs)
-        {
-            yaml.AppendLine($"  {subgraph.Name}:");
-            yaml.AppendLine($"    routing_url: {subgraph.RoutingUrl}");
-            yaml.AppendLine("    schema:");
-
-            // Normalise path separators for YAML
-            var schemaPath = subgraph.SchemaPath.Replace("\\", "/");
-            yaml.AppendLine($"      file: {schemaPath}");
-        }
-
-        await File.WriteAllTextAsync(configPath, yaml.ToString(), cancellationToken);
+        return result;
     }
 
     /// <summary>
