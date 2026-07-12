@@ -28,17 +28,30 @@ public sealed class RouterBinaryManager
     /// 3. PATH environment variable
     /// </summary>
     /// <param name="preferredVersion">Optional preferred version to download if not found.</param>
+    /// <param name="skipDownload">
+    /// When <see langword="true"/>, the method will only search for an existing installation
+    /// and will not attempt to download a new binary. Throws <see cref="RouterProcessException"/>
+    /// if no existing binary is found.
+    /// </param>
     /// <param name="cancellationToken">Propagates cancellation.</param>
     /// <returns>Path to the router binary.</returns>
     /// <exception cref="RouterProcessException">Thrown if the router cannot be located or downloaded.</exception>
     public async Task<string> LocateOrDownloadAsync(
         string? preferredVersion = null,
+        bool skipDownload = false,
         CancellationToken cancellationToken = default)
     {
         // Try to locate existing binary
         var existingPath = TryLocateExisting();
         if (existingPath is not null)
             return existingPath;
+
+        if (skipDownload)
+        {
+            throw new RouterProcessException(
+                "Apollo Router binary not found on this machine and --skip-update was specified. " +
+                "Install the Apollo Router first, or omit --skip-update to allow automatic download.");
+        }
 
         // No existing binary found, download it
         var version = preferredVersion ?? await GetLatestRouterVersionAsync(cancellationToken);

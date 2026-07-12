@@ -19,6 +19,7 @@ public sealed class RouterProcess : IDisposable
 
     private readonly string _routerBinaryPath;
     private readonly int _port;
+    private readonly string _address;
     private string _supergraphSchemaPath;
     private string? _routerConfigPath;
     private Process? _process;
@@ -52,10 +53,17 @@ public sealed class RouterProcess : IDisposable
     /// <param name="port">The port on which the router will listen.</param>
     /// <param name="supergraphSchemaPath">Path to the supergraph schema file.</param>
     /// <param name="routerConfigPath">Path to the router configuration YAML file (optional).</param>
-    public RouterProcess(string routerBinaryPath, int port, string supergraphSchemaPath, string? routerConfigPath = null)
+    /// <param name="address">The address the router will bind to (default: <c>127.0.0.1</c>).</param>
+    public RouterProcess(
+        string routerBinaryPath,
+        int port,
+        string supergraphSchemaPath,
+        string? routerConfigPath = null,
+        string? address = null)
     {
         _routerBinaryPath = routerBinaryPath;
         _port = port;
+        _address = address ?? "127.0.0.1";
         _supergraphSchemaPath = supergraphSchemaPath;
         _routerConfigPath = routerConfigPath;
     }
@@ -85,10 +93,10 @@ public sealed class RouterProcess : IDisposable
         }
 
         // Ensure the port is available
-        if (!IsPortAvailable(_port))
+        if (!IsPortAvailable(_address, _port))
         {
             throw new RouterProcessException(
-                $"Port {_port} is already in use. Choose a different port.");
+                $"Port {_port} is already in use on {_address}. Choose a different port.");
         }
 
         var routerArguments = new Dictionary<string, object?>
@@ -96,7 +104,7 @@ public sealed class RouterProcess : IDisposable
             { "--supergraph", _supergraphSchemaPath },
             { "--hot-reload", "" },
             { "--dev", "" },
-            { "--listen", $"127.0.0.1:{_port}" },
+            { "--listen", $"{_address}:{_port}" },
             { "--config", _routerConfigPath },
             { "--anonymous-telemetry-disabled", "" }
         };
@@ -249,13 +257,17 @@ public sealed class RouterProcess : IDisposable
     }
 
     /// <summary>
-    /// Checks if a TCP port is available for binding.
+    /// Checks if a TCP port is available for binding on the given address.
     /// </summary>
-    private static bool IsPortAvailable(int port)
+    private static bool IsPortAvailable(string address, int port)
     {
         try
         {
-            using var listener = new TcpListener(IPAddress.Loopback, port);
+            var ipAddress = address == "0.0.0.0" || address == "[::]" || address == "::" 
+                ? IPAddress.Any
+                : IPAddress.TryParse(address, out var parsed) ? parsed : IPAddress.Loopback;
+
+            using var listener = new TcpListener(ipAddress, port);
             listener.Start();
             listener.Stop();
             return true;

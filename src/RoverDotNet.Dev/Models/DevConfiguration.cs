@@ -26,10 +26,18 @@ namespace RoverDotNet.Dev.Models;
 /// Optional ELv2 licence acceptance. If set to "accept" (case insensitive), 
 /// the licence acceptance prompt will be suppressed and automatically accepted.
 /// </param>
+/// <param name="RouterAddress">
+/// The address the Apollo Router will listen on (default: <c>127.0.0.1</c>).
+/// Maps to the router's <c>--listen</c> argument.
+/// </param>
 /// <param name="IgnoreSupergraphChanges">
 /// When <see langword="true" />, the session will not watch the supergraph configuration file
 /// for changes. Recomposition and router restarts will only occur on session start.
 /// Defaults to <see langword="false" />.
+/// </param>
+/// <param name="SkipRouterUpdate">
+/// When <see langword="true" />, skips downloading a new Apollo Router binary and only uses
+/// a version already installed on the machine. Defaults to <see langword="false" />.
 /// </param>
 public sealed record DevConfiguration(
     string? SupergraphConfigPath = null,
@@ -39,4 +47,6 @@ public sealed record DevConfiguration(
     string? ComposedSupergraphPath = null,
     string? RouterConfigPath = null,
     string? Elv2Licence = null,
-    bool IgnoreSupergraphChanges = false);
+    string? RouterAddress = null,
+    bool IgnoreSupergraphChanges = false,
+    bool SkipRouterUpdate = false);

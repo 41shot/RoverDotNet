@@ -186,7 +186,8 @@ public sealed class DevSession : IDisposable
             routerBinaryPath,
             _configuration.RouterPort,
             _currentSupergraphPath!,
-            _configuration.RouterConfigPath);
+            _configuration.RouterConfigPath,
+            _configuration.RouterAddress);
 
         _routerProcess.OutputReceived += (_, message) =>
             RaiseStateChanged(State, $"[Router] {message}");
@@ -377,6 +378,7 @@ public sealed class DevSession : IDisposable
         {
             return await routerManager.LocateOrDownloadAsync(
                 preferredVersion: null,
+                skipDownload: _configuration.SkipRouterUpdate,
                 cancellationToken: cancellationToken);
         }
         catch (Exception ex) when (ex is not OperationCanceledException)

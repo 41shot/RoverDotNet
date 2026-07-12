@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    RoverDotNet
+    ===========
+    Console application — a drop-in replacement for `rover dev`.
+    Accepts the same command-line interface as Apollo Rover (subset) and delegates to RoverDotNet.Dev.
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>RoverDotNet</AssemblyName>
+    <RootNamespace>RoverDotNet</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RoverDotNet.Core\RoverDotNet.Core.csproj" />
+    <ProjectReference Include="..\RoverDotNet.Dev\RoverDotNet.Dev.csproj" />
+  </ItemGroup>
+
+</Project>

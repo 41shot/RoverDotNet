@@ -19,6 +19,9 @@
     </Project>
     <Project Path="src/RoverDotNet.Demo/RoverDotNet.Demo.csproj" Id="3a2e11e2-0cec-476b-a86d-dbea71516bb7" />
     <Project Path="src/RoverDotNet.Dev/RoverDotNet.Dev.csproj" />
+    <Project Path="src/RoverDotNet/RoverDotNet.csproj">
+      <Build Solution="Debug|*" Project="false" />
+    </Project>
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/RoverDotNet.Client.Tests/RoverDotNet.Client.Tests.csproj" />
