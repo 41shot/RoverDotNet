@@ -18,11 +18,13 @@
   -->
 
   <ItemGroup>
-    <ProjectReference Include="..\RoverDotNet.Client\RoverDotNet.Client.csproj" />
+    <Compile Remove="Watchers\**" />
+    <EmbeddedResource Remove="Watchers\**" />
+    <None Remove="Watchers\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Watchers\" />
+    <ProjectReference Include="..\RoverDotNet.Client\RoverDotNet.Client.csproj" />
   </ItemGroup>
 
 </Project>

@@ -26,6 +26,11 @@ namespace RoverDotNet.Dev.Models;
 /// Optional ELv2 licence acceptance. If set to "accept" (case insensitive), 
 /// the licence acceptance prompt will be suppressed and automatically accepted.
 /// </param>
+/// <param name="IgnoreSupergraphChanges">
+/// When <see langword="true" />, the session will not watch the supergraph configuration file
+/// for changes. Recomposition and router restarts will only occur on session start.
+/// Defaults to <see langword="false" />.
+/// </param>
 public sealed record DevConfiguration(
     string? SupergraphConfigPath = null,
     string? SupergraphConfigContent = null,
@@ -33,4 +38,5 @@ public sealed record DevConfiguration(
     string? RouterBinaryPath = null,
     string? ComposedSupergraphPath = null,
     string? RouterConfigPath = null,
-    string? Elv2Licence = null);
+    string? Elv2Licence = null,
+    bool IgnoreSupergraphChanges = false);

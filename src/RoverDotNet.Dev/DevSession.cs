@@ -220,8 +220,10 @@ public sealed class DevSession : IDisposable
 
     private void StartWatching()
     {
-        if (_supergraphConfigPath == null)
+        if (_supergraphConfigPath == null || _configuration.IgnoreSupergraphChanges)
+        {
             return;
+        }
 
         var directory = Path.GetDirectoryName(_supergraphConfigPath);
         var fileName = Path.GetFileName(_supergraphConfigPath);
