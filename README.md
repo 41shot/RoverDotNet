@@ -7,6 +7,7 @@ Currently ported:
 1. Config whoami
 2. Config auth
 3. Dev
+4. Router coprocessor (RoverDotNet.Coprocessor)
 
 A .NET Winforms demo application will also be created to demonstrate the usage of the library.
 

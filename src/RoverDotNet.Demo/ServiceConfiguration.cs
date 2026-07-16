@@ -4,6 +4,7 @@ using RoverDotNet.Client.Operations.WhoAmI;
 using RoverDotNet.Config.Auth;
 using RoverDotNet.Config.WhoAmI;
 using RoverDotNet.Core.Config;
+using RoverDotNet.Core.Coprocessor;
 using RoverDotNet.Demo.Forms;
 
 namespace RoverDotNet.Demo;
@@ -44,11 +45,15 @@ internal static class ServiceConfiguration
         services.AddSingleton<IApiKeyPrompt, WinFormsApiKeyPrompt>();
         services.AddSingleton<ConfigAuth>();
 
+        // Coprocessor
+        services.AddSingleton<ICoprocessorActivityLog, InMemoryCoprocessorActivityLog>();
+
         // Forms
         services.AddSingleton<MainForm>();
         services.AddTransient<ConfigWhoAmIForm>();
         services.AddTransient<ConfigAuthForm>();
         services.AddTransient<DevForm>();
+        services.AddTransient<CoprocessorForm>();
 
         return services;
     }

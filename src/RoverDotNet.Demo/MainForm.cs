@@ -7,13 +7,15 @@ namespace RoverDotNet.Demo
         private readonly ConfigWhoAmIForm _configWhoAmIForm;
         private readonly ConfigAuthForm _configAuthForm;
         private readonly DevForm _devForm;
+        private readonly CoprocessorForm _coprocessorForm;
 
-        public MainForm(ConfigWhoAmIForm configWhoAmIForm, ConfigAuthForm configAuthForm, DevForm devForm)
+        public MainForm(ConfigWhoAmIForm configWhoAmIForm, ConfigAuthForm configAuthForm, DevForm devForm, CoprocessorForm coprocessorForm)
         {
             InitializeComponent();
             _configWhoAmIForm = configWhoAmIForm;
             _configAuthForm = configAuthForm;
             _devForm = devForm;
+            _coprocessorForm = coprocessorForm;
         }
 
         private void configWhoAmIButton_Click(object sender, EventArgs e)
@@ -36,7 +38,27 @@ namespace RoverDotNet.Demo
 
         private void devButton_Click(object sender, EventArgs e)
         {
-            _devForm.ShowDialog(this);
+            ShowNonModal(_devForm);
+        }
+
+        private void coprocessorButton_Click(object sender, EventArgs e)
+        {
+            ShowNonModal(_coprocessorForm);
+        }
+
+        private void ShowNonModal(Form form)
+        {
+            if (!form.Visible)
+            {
+                form.Show(this);
+            }
+
+            if (form.WindowState == FormWindowState.Minimized)
+            {
+                form.WindowState = FormWindowState.Normal;
+            }
+
+            form.Activate();
         }
     }
 }

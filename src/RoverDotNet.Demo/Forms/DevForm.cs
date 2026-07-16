@@ -152,6 +152,15 @@ public partial class DevForm : RoverOperationFormBase
 
     private async void DevForm_FormClosing(object sender, FormClosingEventArgs e)
     {
+        if (e.CloseReason == CloseReason.UserClosing)
+        {
+            // Keep the form (and any running dev session) alive so it can be reopened
+            // from the main form without losing state.
+            e.Cancel = true;
+            Hide();
+            return;
+        }
+
         await StopDevSession();
     }
 

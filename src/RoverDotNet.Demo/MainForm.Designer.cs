@@ -33,6 +33,7 @@
             configWhoAmIButton = new Button();
             configAuthButton = new Button();
             devButton = new Button();
+            coprocessorButton = new Button();
             operationsGroupBox = new GroupBox();
             titleLabel = new Label();
             operationsGroupBox.SuspendLayout();
@@ -85,14 +86,25 @@
             devButton.UseVisualStyleBackColor = true;
             devButton.Click += devButton_Click;
             // 
+            // coprocessorButton
+            // 
+            coprocessorButton.Location = new Point(15, 200);
+            coprocessorButton.Name = "coprocessorButton";
+            coprocessorButton.Size = new Size(200, 40);
+            coprocessorButton.TabIndex = 7;
+            coprocessorButton.Text = "Coprocessor";
+            coprocessorButton.UseVisualStyleBackColor = true;
+            coprocessorButton.Click += coprocessorButton_Click;
+            // 
             // operationsGroupBox
             // 
             operationsGroupBox.Controls.Add(configWhoAmIButton);
             operationsGroupBox.Controls.Add(devButton);
             operationsGroupBox.Controls.Add(configAuthButton);
+            operationsGroupBox.Controls.Add(coprocessorButton);
             operationsGroupBox.Location = new Point(12, 110);
             operationsGroupBox.Name = "operationsGroupBox";
-            operationsGroupBox.Size = new Size(349, 200);
+            operationsGroupBox.Size = new Size(349, 256);
             operationsGroupBox.TabIndex = 5;
             operationsGroupBox.TabStop = false;
             operationsGroupBox.Text = "Operations";
@@ -111,7 +123,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(373, 330);
+            ClientSize = new Size(373, 386);
             Controls.Add(titleLabel);
             Controls.Add(operationsGroupBox);
             Controls.Add(profileTextBox);
@@ -133,6 +145,7 @@
         private Button configWhoAmIButton;
         private Button configAuthButton;
         private Button devButton;
+        private Button coprocessorButton;
         private GroupBox operationsGroupBox;
         private Label titleLabel;
     }
