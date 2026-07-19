@@ -15,9 +15,7 @@
   <Folder Name="/src/">
     <Project Path="src/RoverDotNet.Client/RoverDotNet.Client.csproj" />
     <Project Path="src/RoverDotNet.Config/RoverDotNet.Config.csproj" />
-    <Project Path="src/RoverDotNet.Coprocessor/RoverDotNet.Coprocessor.csproj">
-      <Build Solution="Debug|*" Project="false" />
-    </Project>
+    <Project Path="src/RoverDotNet.Coprocessor/RoverDotNet.Coprocessor.csproj" />
     <Project Path="src/RoverDotNet.Core/RoverDotNet.Core.csproj" />
     <Project Path="src/RoverDotNet.Demo.Api.Products/RoverDotNet.Demo.Api.Products.csproj">
       <Build Solution="Debug|*" Project="false" />
