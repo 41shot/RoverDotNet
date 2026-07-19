@@ -8,8 +8,11 @@ namespace RoverDotNet.Core.Config;
 /// <see cref="GetValue"/> searches Process → User → Machine scopes in priority order.
 /// </para>
 /// <para>
-/// <see cref="SetValue"/> targets User scope on Windows; falls back to Process scope
+/// <see cref="SetUserValue"/> targets User scope on Windows; falls back to Process scope
 /// on Linux/macOS where user-level persistence is not supported by .NET APIs.
+/// </para>
+/// <para>
+/// <see cref="SetProcessValue"/> targets Process scope.
 /// </para>
 /// </remarks>
 public static class EnvironmentVariableHelper
@@ -74,7 +77,7 @@ public static class EnvironmentVariableHelper
     /// not persisted). User-level persistence on Unix requires shell profile modifications not provided by .NET.
     /// </para>
     /// </remarks>
-    public static void SetValue(string key, string? value)
+    public static void SetUserValue(string key, string? value)
     {
         try
         {
@@ -84,7 +87,18 @@ public static class EnvironmentVariableHelper
         catch (PlatformNotSupportedException)
         {
             // User scope not supported (Linux/macOS) - fall back to Process scope
-            Environment.SetEnvironmentVariable(key, value, EnvironmentVariableTarget.Process);
+            SetProcessValue(key, value);
         }
+    }
+
+    /// <summary>
+    /// Sets an environment variable in Process scope.
+    /// </summary>
+    /// <param name="key">The environment variable name.</param>
+    /// <param name="value">The value to set. Pass <see langword="null"/> to remove the variable.</param>
+    public static void SetProcessValue(string key, string? value)
+    {
+        // Set in Process scope
+        Environment.SetEnvironmentVariable(key, value, EnvironmentVariableTarget.Process);
     }
 }

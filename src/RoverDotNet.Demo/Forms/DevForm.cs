@@ -1,3 +1,4 @@
+using RoverDotNet.Core.Config;
 using RoverDotNet.Dev;
 using RoverDotNet.Dev.Exceptions;
 using RoverDotNet.Dev.Models;
@@ -70,6 +71,9 @@ public partial class DevForm : RoverOperationFormBase
             stopButton.Enabled = true;
             routerPortTextBox.Enabled = false;
             acceptElv2CheckBox.Enabled = false;
+            enableCoprocessorCheckBox.Enabled = false;
+            apolloKeyTextBox.Enabled = false;
+            apolloGraphRefTextBox.Enabled = false;
             saveConfigButton.Enabled = true;
 
             _cancellationTokenSource = new CancellationTokenSource();
@@ -299,11 +303,51 @@ public partial class DevForm : RoverOperationFormBase
         // Configure ELv2 licence acceptance
         var elv2Licence = acceptElv2CheckBox.Checked ? "accept" : null;
 
+        var coprocessorEnabled = enableCoprocessorCheckBox.Checked;
+        var routerConfigPath = coprocessorEnabled ? "Router-with-coprocessor.yaml" : "Router.yaml";
+
+        if (coprocessorEnabled)
+        {
+            var apolloKey = apolloKeyTextBox.Text.Trim();
+            if (!string.IsNullOrEmpty(apolloKey))
+            {
+                if (!apolloKey.StartsWith("service:", StringComparison.Ordinal))
+                {
+                    var result = MessageBox.Show(
+                        "The Apollo Key should be a graph (service) token, starting with \"service:\", not a personal \"user:\" token. " +
+                        "Graph tokens are found in GraphOS Studio and must be licenced for coprocessor use. Continue anyway?",
+                        "Check Apollo Key",
+                        MessageBoxButtons.OKCancel,
+                        MessageBoxIcon.Warning);
+
+                    if (result != DialogResult.OK)
+                    {
+                        return null;
+                    }
+                }
+
+                EnvironmentVariableHelper.SetProcessValue("APOLLO_KEY", apolloKey);
+            }
+
+            var apolloGraphRef = apolloGraphRefTextBox.Text.Trim();
+            if (!string.IsNullOrEmpty(apolloGraphRef))
+            {
+                EnvironmentVariableHelper.SetProcessValue("APOLLO_GRAPH_REF", apolloGraphRef);
+            }
+        }
+
         return new DevConfiguration(
             SupergraphConfigPath: _tempSupergraphConfigPath,
             RouterPort: port,
-            RouterConfigPath: "Router.yaml",
+            RouterConfigPath: routerConfigPath,
             Elv2Licence: elv2Licence);
+    }
+
+    private void enableCoprocessorCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+        var enabled = enableCoprocessorCheckBox.Checked;
+        apolloKeyTextBox.Enabled = enabled;
+        apolloGraphRefTextBox.Enabled = enabled;
     }
 
     private void ResetControls()
@@ -313,6 +357,9 @@ public partial class DevForm : RoverOperationFormBase
         subgraphsTextBox.Enabled = true;
         routerPortTextBox.Enabled = true;
         acceptElv2CheckBox.Enabled = true;
+        enableCoprocessorCheckBox.Enabled = true;
+        apolloKeyTextBox.Enabled = enableCoprocessorCheckBox.Checked;
+        apolloGraphRefTextBox.Enabled = enableCoprocessorCheckBox.Checked;
         saveConfigButton.Enabled = false;
     }
 

@@ -109,7 +109,7 @@ public sealed class CompositionRunner
         // Set environment variable to accept ELv2 licence
         if (acceptLicence)
         {
-            EnvironmentVariableHelper.SetValue("APOLLO_ELV2_LICENSE", "accept");
+            EnvironmentVariableHelper.SetUserValue("APOLLO_ELV2_LICENSE", "accept");
         }
 
         using var process = new Process { StartInfo = startInfo };
