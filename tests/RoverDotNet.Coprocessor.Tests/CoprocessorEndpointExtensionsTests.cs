@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using RoverDotNet.Core.Coprocessor;
-using RoverDotNet.Coprocessor.Middleware;
 using Xunit;
 
 namespace RoverDotNet.Coprocessor.Tests;
@@ -63,7 +62,7 @@ public class CoprocessorEndpointExtensionsTests
     [Fact]
     public async Task HandleAsync_DoesNotMutateOriginalRequestPayload()
     {
-        var addsClaims = new AuthClaimsCoprocessorMiddleware();
+        var addsClaims = new ClaimsAddingMiddleware();
 
         var payload = new CoprocessorPayload { Stage = nameof(CoprocessorStage.RouterRequest) };
         var request = CreateRequest(payload);
@@ -140,6 +139,21 @@ public class CoprocessorEndpointExtensionsTests
             context.Payload.Control = CoprocessorControl.Break(statusCode);
             // Intentionally does not call `next`, short-circuiting the pipeline.
             return Task.CompletedTask;
+        }
+    }
+
+    private sealed class ClaimsAddingMiddleware : ICoprocessorMiddleware
+    {
+        public Task InvokeAsync(CoprocessorMiddlewareContext context, CoprocessorMiddlewareDelegate next, CancellationToken cancellationToken)
+        {
+            if (context.Stage == CoprocessorStage.RouterRequest)
+            {
+                var payload = context.Payload;
+                payload.Context ??= new CoprocessorContext();
+                payload.Context.Entries["apollo::authentication::jwt_claims"] = JsonSerializer.SerializeToElement(new { scope = "profile:read profile:write" });
+            }
+
+            return next(context, cancellationToken);
         }
     }
 }

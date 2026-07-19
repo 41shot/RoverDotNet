@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <!--
     RoverDotNet.Coprocessor
@@ -29,6 +29,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RoverDotNet.Core\RoverDotNet.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Middleware\" />
   </ItemGroup>
 
 </Project>

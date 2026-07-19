@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using RoverDotNet.Core.Coprocessor;
 using RoverDotNet.Coprocessor;
+using RoverDotNet.Demo.Middleware;
 
 namespace RoverDotNet.Demo.Forms;
 
@@ -55,7 +56,7 @@ public partial class CoprocessorForm : Form
                 {
                     // Share this form's activity log so the demo can display live requests/responses.
                     services.AddSingleton(_activityLog);
-                    services.AddCoprocessorMiddleware<RoverDotNet.Coprocessor.Middleware.AuthClaimsCoprocessorMiddleware>();
+                    services.AddCoprocessorMiddleware<AuthClaimsCoprocessorMiddleware>();
                 });
 
             await _app.StartAsync();

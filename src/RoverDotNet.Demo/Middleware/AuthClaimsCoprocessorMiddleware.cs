@@ -1,7 +1,7 @@
 using System.Text.Json;
 using RoverDotNet.Core.Coprocessor;
 
-namespace RoverDotNet.Coprocessor.Middleware;
+namespace RoverDotNet.Demo.Middleware;
 
 /// <summary>
 /// Sample middleware demonstrating how to add authorization claims to the request context so
