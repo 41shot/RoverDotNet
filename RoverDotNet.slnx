@@ -3,14 +3,17 @@
     <File Path=".editorconfig" />
     <File Path=".gitignore" />
     <File Path="CONTRIBUTING.md" />
-    <File Path="Demo.Api-README.md" />
-    <File Path="DEMO_SERVICES.md" />
-    <File Path="DEMO_SERVICES_QUICK_REF.md" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
     <File Path="LICENSE" />
-    <File Path="QUERY_EXAMPLES.md" />
     <File Path="README.md" />
+  </Folder>
+  <Folder Name="/docs/">
+    <File Path="docs/COPROCESSOR.md" />
+    <File Path="docs/DEMO_SERVICES.md" />
+    <File Path="docs/ROVERDOTNET_CLI.md" />
+    <File Path="docs/ROVERDOTNET_CONFIG.md" />
+    <File Path="docs/ROVERDOTNET_DEV.md" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/RoverDotNet.Client/RoverDotNet.Client.csproj" />

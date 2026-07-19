@@ -42,6 +42,7 @@ When implementing features:
 ### 5. Project Structure
 
 The solution is organised into:
+- `src/RoverDotNet` - RoverDotNet console app (similar to Apollo Rover).
 - `src/RoverDotNet.Config` - Rover config (e.g. whoami, auth) operations.
 - `src/RoverDotNet.Client` - Apollo API client.
 - `src/RoverDotNet.Dev` - Rover dev operation.
