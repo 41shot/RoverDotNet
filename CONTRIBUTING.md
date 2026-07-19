@@ -46,6 +46,9 @@ The solution is organised into:
 - `src/RoverDotNet.Client` - Apollo API client.
 - `src/RoverDotNet.Dev` - Rover dev operation.
 - `src/RoverDotNet.Core` - Shared interfaces, models, functionality, etc.
+- `src/RoverDotNet.Coprocessor` - Apollo router coprocessor service.
+- `src/RoverDotNet.Demo.Api.Users` - Demo GraphQL Users API service.
+- `src/RoverDotNet.Demo.Api.Products` - Demo GraphQL Products API service.
 - `tests/` - Unit tests for each project
 
 ### 6. Testing

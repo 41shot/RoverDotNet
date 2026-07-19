@@ -2,9 +2,14 @@
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
     <File Path=".gitignore" />
+    <File Path="CONTRIBUTING.md" />
+    <File Path="Demo.Api-README.md" />
+    <File Path="DEMO_SERVICES.md" />
+    <File Path="DEMO_SERVICES_QUICK_REF.md" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
     <File Path="LICENSE" />
+    <File Path="QUERY_EXAMPLES.md" />
     <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
